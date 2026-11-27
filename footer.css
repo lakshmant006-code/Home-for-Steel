@@ -15,7 +15,6 @@ footer.hf .p2m-key b{background:#fff;color:#000}footer.hf .p2m-key span{color:rg
 @media(max-width:760px){footer.hf .p2m-key div{border-right:0;border-bottom:1px solid rgba(255,255,255,.22)}}
 
 footer.hf .hf-in{max-width:1180px;position:relative;z-index:1;color:#fff}
-.hs-stage{margin-bottom:0}
 .hf-cta{display:inline-flex;align-items:center;gap:12px;margin:26px auto 0;padding:15px 28px;border-radius:999px;background:#fff;color:#000;font-weight:600;font-size:17px;text-decoration:none;transition:transform .3s,box-shadow .3s;position:relative;left:50%;transform:translateX(-50%)}
 .hf-cta:hover{box-shadow:0 0 0 6px rgba(255,255,255,.18)}
 .hf-cta span{display:inline-block;transition:transform .3s}.hf-cta:hover span{transform:translateX(5px)}

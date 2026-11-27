@@ -502,13 +502,6 @@ nav .npill{white-space:nowrap}@media(max-width:560px){nav .npill{padding:8px 12p
 .hero p{font-size:clamp(14px,1.15vw,17px)!important;margin:12px auto 18px!important}
 
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.hs-stage{position:relative;height:172px;margin-bottom:6px}
-.hs-ink{position:absolute;top:0;left:0;overflow:visible}
-.hs-rail{position:absolute;top:0;bottom:0;width:9px;border-radius:5px;background:linear-gradient(90deg,#bfcad6,#f6f9fc 40%,#aab7c4)}.hs-rail.l{left:0}.hs-rail.r{right:0}
-.hs-beam{position:absolute;left:14px;right:14px;height:9px;margin-top:-4px;border-radius:5px;background:linear-gradient(#ffffff,#dfe7ef 40%,#a9b6c4);box-shadow:0 8px 14px -8px rgba(30,50,70,.3)}
-.hs-blk{position:absolute;width:30px;height:32px;border-radius:9px;background:linear-gradient(#ffffff,#c4d0dc);border:1px solid rgba(60,80,100,.3)}.hs-blk.l{left:-10px}.hs-blk.r{right:-10px}
-.hs-blk:after{content:"";position:absolute;left:9px;top:8px;width:12px;height:12px;border-radius:50%;background:conic-gradient(#B3152B 0 25%,#fff 0 50%,#B3152B 0 75%,#fff 0);transform:rotate(var(--r,0deg))}
-.hs-car{position:absolute;width:58px;height:72px;will-change:left,top}
 
 .hero{min-height:700px!important}
 .skbar{top:78px;bottom:auto;right:var(--g)}
@@ -1045,13 +1038,6 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
   </div>
   <div class="hf-in">
     <h2 class="sr">Request a custom plan</h2>
-    <div class="hs-stage" id="hsStage" aria-hidden="true"><i class="hs-rail l"></i><i class="hs-rail r"></i><svg class="hs-ink" id="hsInk"></svg><i class="hs-beam" id="hsBeam"></i><i class="hs-blk l" id="hsBl"></i><i class="hs-blk r" id="hsBr"></i><svg class="hs-car" id="hsCar" viewBox="0 0 120 150" width="58" height="72" aria-hidden="true"><defs><linearGradient id="hfb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4d6479"/><stop offset=".6" stop-color="#2f4559"/><stop offset="1" stop-color="#1c2c3b"/></linearGradient><linearGradient id="hfp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d7d8da"/><stop offset=".4" stop-color="#fff"/><stop offset="1" stop-color="#c4c6ca"/></linearGradient></defs>
-<path d="M50 8l4-8h12l4 8 5 26v50H45V34z" fill="url(#hfp)"/><rect x="45" y="46" width="30" height="8" fill="#1f54d8"/>
-<ellipse cx="60" cy="146" rx="46" ry="5" fill="rgba(60,45,20,.18)"/><rect x="8" y="84" width="104" height="58" rx="14" fill="url(#hfb)" stroke="rgba(255,255,255,.22)"/>
-<rect x="16" y="98" width="38" height="22" rx="5" fill="#1b3a34"/><g fill="#8fe6c0"><rect x="21" y="108" width="4" height="8"/><rect x="28" y="104" width="4" height="12"/><rect x="35" y="110" width="4" height="6"/><rect x="42" y="106" width="4" height="10"/></g>
-<g class="hf-red"><circle cx="70" cy="110" r="14" fill="#cfc6ae"/><circle cx="70" cy="110" r="10" fill="#f0562f"/><circle cx="70" cy="100" r="1.6" fill="#8c8470"/><circle cx="80" cy="110" r="1.6" fill="#8c8470"/><circle cx="70" cy="120" r="1.6" fill="#8c8470"/><circle cx="60" cy="110" r="1.6" fill="#8c8470"/></g>
-<g class="hf-dial"><circle cx="98" cy="118" r="10" fill="#e3c142"/><rect x="97" y="109" width="2" height="6" fill="#6b5a2b"/></g>
-<g class="hf-w"><circle cx="30" cy="144" r="7" fill="#2a2a2c"/><rect x="26" y="143" width="8" height="2" fill="#9a9a9c"/></g><g class="hf-w"><circle cx="90" cy="144" r="7" fill="#2a2a2c"/><rect x="86" y="143" width="8" height="2" fill="#9a9a9c"/></g></svg></div>
     <a class="hf-cta" href="mailto:marketing@homeplansforsteel.com?subject=Custom%20plan%20request">Request a custom plan <span aria-hidden="true">&rarr;</span></a>
     <div class="hf-grid">
       <p><b class="hf-h">Visit</b>UBC Technology Services Inc<br>885 Gold Hill Rd #3083<br>Fort Mill, SC 29708</p>
@@ -1146,7 +1132,10 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     for(var y=0;y<h;y++)for(var xx=0;xx<w;xx++){if(d[(y*w+xx)*4+3]>110)pool.push([xx/w,y/h])}
     PL=[];for(var i=0;i<16000;i++){var p=pool[(Math.random()*pool.length)|0];PL.push([p[0]+(Math.random()-.5)/w,p[1]+(Math.random()-.5)/h])}}
   function renderPlan(){PC=document.createElement('canvas');PC.width=W*DP;PC.height=H*DP;var c=PC.getContext('2d');c.setTransform(DP,0,0,DP,0,0);c.drawImage(pimg,bP.x,bP.y,bP.w,bP.h);c.globalCompositeOperation='source-in';c.fillStyle='#fff';c.fillRect(0,0,W,H)}
-  function layout(){DP=Math.min(2,devicePixelRatio||1);W=st.clientWidth;H=st.clientHeight;cv.width=W*DP;cv.height=H*DP;var pad=20,ar=pimg.naturalWidth/pimg.naturalHeight,ph=Math.min(H*.1,(W-pad*2)*.26/ar),pw=ph*ar;bP={x:(W-pw)/2,y:H-pad-ph-6,w:pw,h:ph};bH={x:pad,y:pad,w:W-pad*2,h:H-pad*2-ph-6};renderPlan()}
+  function layout(){DP=Math.min(2,devicePixelRatio||1);W=st.clientWidth;H=st.clientHeight;cv.width=W*DP;cv.height=H*DP;var pad=20,ar=pimg.naturalWidth/pimg.naturalHeight;
+    if(W<760){var ph=Math.min(H*.1,(W-pad*2)*.26/ar),pw=ph*ar;bP={x:(W-pw)/2,y:H-pad-ph-6,w:pw,h:ph};bH={x:pad,y:pad,w:W-pad*2,h:H-pad*2-ph-6}} /* phones: plan below, model above */
+    else{var ph3=Math.min(H*.1,(W-pad*2)*.26/ar),pw3=ph3*ar;bP={x:pad+W*.02,y:H-pad-ph3-6,w:pw3,h:ph3};bH={x:pad+W*.22,y:pad,w:W-pad*2,h:H-pad*2-ph3-6}} /* same sizes as before: plan bottom-left corner, model top-right, dots stream diagonally */
+    renderPlan()}
   function init(){var n=Math.min(M.length/4|0,84000);mx=new Float32Array(n);my=new Float32Array(n);mz=new Float32Array(n);mt=new Uint16Array(n);dpt=new Float32Array(n);NM=n;
     var x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,z0=1e9,z1=-1e9;for(var i=0;i<n;i++){var X=M[i*4]/10,Y=M[i*4+1]/10,Z=M[i*4+2]/10;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;if(Z<z0)z0=Z;if(Z>z1)z1=Z}
     var gx=(x0+x1)/2,gy=(y0+y1)/2,gz=(z0+z1)/2;/* pivot = true centre of the house, so it turns about its own vertical axis */
@@ -1188,49 +1177,6 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     if(hs&&hs.length>1){setTimeout(function(){var el=document.getElementById(hs.slice(1));if(el)el.scrollIntoView()},60)}else scrollTo(0,0)}
   addEventListener('hashchange',route);route();
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href^="#"]');if(a&&V[a.getAttribute('href')]&&location.hash===a.getAttribute('href')){e.preventDefault();scrollTo(0,0)}})})();
-
-/* ---------- footer: the pen really writes the line, stroke by stroke ---------- */
-(function(){
-  var G={ // single-stroke handwriting, y up, baseline 0, x-height 10, ascender 18, descender -7 ; [advance, [paths]]
-   'R':[15,['M0 0L0 18','M0 18C9 18 11.5 17 11.5 13.5C11.5 10 8.5 9 0 9','M5.5 9L11.5 0']],
-   'e':[11,['M1.2 5.2L9.4 5.2C9.4 8.6 7.6 10 5 10C2.2 10 .6 7.8 .6 5C.6 2.2 2.4 0 5 0C7 0 8.6 .9 9.6 2.4']],
-   'q':[11,['M9 8.2C8 9.7 6.6 10 5 10C2.2 10 .6 7.8 .6 5C.6 2.2 2.2 0 5 0C6.6 0 8 .5 9 2','M9.2 10L9.2 -7']],
-   'u':[11,['M.6 10L.6 3.6C.6 1 2.3 0 4.6 0C7 0 8.6 1.5 9.2 3.6','M9.2 10L9.2 .4C9.4 .2 10 .2 10.6 .8']],
-   's':[10,['M8.5 8.6C7.4 10.2 3 10.6 2 8.2C1.4 6.2 4 5.5 5 5.1C7 4.4 9 3.8 8.4 1.8C7.6 -.2 2.4 0 1 2.2']],
-   't':[9,['M4 16.5L4 2.6C4 .6 5.4 0 7.6 .7','M.8 10L7.8 10']],
-   'a':[11,['M9 8.2C8 9.7 6.6 10 5 10C2.2 10 .6 7.8 .6 5C.6 2.2 2.2 0 5 0C6.6 0 8 .5 9 2','M9.2 10L9.2 .6C9.4 .2 10 .2 10.8 .8']],
-   'c':[10,['M9 8.2C8 9.7 6.6 10 5 10C2.2 10 .6 7.8 .6 5C.6 2.2 2.2 0 5 0C6.6 0 8 .5 9 2']],
-   'o':[11,['M5.2 10C2.4 10 .7 7.8 .7 5C.7 2.2 2.4 0 5.2 0C8 0 9.7 2.2 9.7 5C9.7 7.8 8 10 5.2 10']],
-   'm':[14.5,['M.6 10L.6 0','M.6 7C1.5 9.4 3 10 4.6 10C6.3 10 7.1 8.6 7.1 6L7.1 0','M7.1 6.2C7.1 9 8.7 10 10.3 10C12 10 12.9 8.6 12.9 6L12.9 0']],
-   'p':[11,['M.6 10L.6 -7','M.6 6C1.6 9 3 10 4.9 10C7.7 10 9.3 7.8 9.3 5C9.3 2.2 7.7 0 4.9 0C3.1 0 1.6 1 .6 4']],
-   'l':[6.5,['M2.6 18L2.6 1.6C2.6 .5 3.4 0 4.6 .3']],
-   'n':[10,['M.6 10L.6 0','M.6 6.6C1.5 9.4 3 10 4.7 10C6.9 10 8.1 8.7 8.1 6L8.1 0']],
-   ' ':[6,[]]};
-  var TXT='Request a custom plan',f=$('#foot'),stage=$('#hsStage'),inkSvg=$('#hsInk'),beam=$('#hsBeam'),car=$('#hsCar'),blkL=$('#hsBl'),blkR=$('#hsBr'),red=car.querySelector('.hf-red'),dial=car.querySelector('.hf-dial'),ws=[].slice.call(car.querySelectorAll('.hf-w')),knobs=[blkL,blkR];
-  var NS='http://www.w3.org/2000/svg',K=2.5,SLANT=.16,BASE=72,paths=[],W=0,X0=0,pen={x:0,y:0},cum=0,state='idle';
-  function tf(d,ox){ // scale, flip y, slant, translate
-    return d.replace(/([MLC])([^MLC]*)/g,function(_,c,args){var n=args.trim().split(/[\s,]+/).map(Number),o=[];for(var i=0;i<n.length;i+=2){var x=n[i],y=n[i+1];o.push(((ox+x+SLANT*y)*K).toFixed(1)+' '+(BASE-y*K).toFixed(1))}return c+o.join(' ')})}
-  function build(){inkSvg.innerHTML='';paths=[];var ox=0;for(var i=0;i<TXT.length;i++){var g=G[TXT[i]];if(!g)continue;g[1].forEach(function(d){var p=document.createElementNS(NS,'path');p.setAttribute('d',tf(d,ox));p.setAttribute('fill','none');p.setAttribute('stroke','#ffffff');p.setAttribute('stroke-width','2.7');p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');inkSvg.appendChild(p);var L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;paths.push({p:p,L:L})});ox+=g[0]+1.1}
-    W=(ox+3)*K+10;inkSvg.setAttribute('width',W);inkSvg.setAttribute('height',110);inkSvg.setAttribute('viewBox','0 0 '+W+' 110');
-    X0=(stage.clientWidth-W)/2;inkSvg.style.left=X0+'px'}
-  function place(x,y){pen.x=x;pen.y=y;car.style.left=(X0+x-29)+'px';car.style.top=(y-3)+'px';var by=y+50;beam.style.top=by+'px';blkL.style.top=blkR.style.top=(by-12)+'px';
-    var a=cum/9;ws.forEach(function(w){w.style.transform='rotate('+a+'deg)'});knobs.forEach(function(k,i){k.style.setProperty('--r',(a*(i?-1:1))+'deg')});dial.style.transform='rotate('+(cum/5)+'deg)'}
-  function run(){build();var q=[],cx=W*.5,cy=96;paths.forEach(function(s){var a=s.p.getPointAtLength(0);q.push({t:'m',x:a.x,y:a.y});q.push({t:'d',s:s})});q.push({t:'m',x:cx,y:100});
-    var cur={x:cx,y:cy},qi=0,t0=0,seg=null,last=performance.now();place(cx,cy);f.classList.add('idle');
-    function nextSeg(){var s=q[qi++];if(!s){state='done';f.classList.add('idle');return null}
-      if(s.t==='m'){var d=Math.hypot(s.x-cur.x,s.y-cur.y);return {t:'m',a:{x:cur.x,y:cur.y},b:s,dur:Math.max(120,d/700*1000)}}
-      return {t:'d',s:s.s,dur:Math.max(180,s.s.L/150*1000)}}
-    seg=nextSeg();t0=performance.now();
-    (function step(now){if(!seg)return;var u=Math.min(1,(now-t0)/seg.dur),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2,x,y;
-      if(seg.t==='m'){x=seg.a.x+(seg.b.x-seg.a.x)*e;y=seg.a.y+(seg.b.y-seg.a.y)*e;f.classList.add('idle')}
-      else{var pt=seg.s.p.getPointAtLength(u*seg.s.L);x=pt.x;y=pt.y;seg.s.p.style.strokeDashoffset=seg.s.L*(1-u);f.classList.remove('idle')}
-      cum+=Math.abs(x-cur.x)+Math.abs(y-cur.y);cur.x=x;cur.y=y;place(x,y);
-      if(u>=1){seg=nextSeg();t0=now;if(!seg)return}requestAnimationFrame(step)})(t0)}
-  var RMf=matchMedia('(prefers-reduced-motion:reduce)').matches,started=false;
-  function staticView(){build();paths.forEach(function(s){s.p.style.strokeDashoffset=0});place(W*.5,100);f.classList.add('idle')}
-  new IntersectionObserver(function(es){if(es[0].isIntersecting&&!started){started=true;if(RMf)staticView();else(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(run)}},{threshold:.4}).observe(f);
-  build();place(W*.5,100);addEventListener('resize',function(){if(started){if(state==='done'||RMf){staticView()}}else{build();place(W*.5,100)}});
-})();
 
 /* ---------- hero: draw a house, watch it become a drafted plan, press one button to extrude it into 3D ---------- */
 (function(){
@@ -1421,6 +1367,7 @@ new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){start();i
 <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 <link rel="stylesheet" href="modify.css">
 <link rel="stylesheet" href="footer.css">
+<link rel="stylesheet" href="cursor.css">
 <script src="animations.js"></script>
 <script src="modify.js"></script>
 
