@@ -1026,12 +1026,9 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
 </section></div>
 <div id="modifyPage" class="vpage" hidden><section class="modify wrap sheet" id="modify">
   <div class="sh-bar"><span>02 ◇ CHANGE A PLAN</span><span>SHEET A-03</span></div>
-  <h2 class="lead reveal">Click anywhere to say what you want different.</h2>
-  <p class="sub">Drop a pin, type your change, and watch the plan redraw.</p>
-  <div class="mod reveal">
-    <div class="mod-stage" id="modStage"><svg id="modSvg" viewBox="0 0 400 260" role="img" aria-label="Plan to mark up"></svg><div class="pinlayer" id="pins"></div><div class="pop" id="pop" hidden><textarea id="popTx" rows="2" placeholder="e.g. make this bedroom bigger"></textarea><div class="pr"><button type="button" id="popX" class="skb">Cancel</button><button type="button" id="popOk" class="skb red">Add</button></div></div></div>
-    <aside class="mod-side"><div class="mono">Revisions</div><ol id="revs"><li class="empty">No pins yet. Click on the plan.</li></ol><button type="button" class="btn" id="applyBtn" disabled>Apply my changes</button><p class="mut" id="modNote">Demo: changes are redrawn locally. Your real request goes to our team.</p></aside>
-  </div>
+  <h2 class="lead reveal">Pick a plan. Mark what you want different.</h2>
+  <p class="sub">Choose a plan, drag over the part you want different, and watch it redraw.</p>
+  <div class="mod2" id="mod2"></div>
 </section></div>
 <div id="bringPage" class="vpage" hidden><section class="bring wrap sheet" id="bring">
   <div class="sh-bar"><span>03 ◇ BRING YOUR OWN PLAN</span><span>SHEET A-04</span></div>
@@ -1092,6 +1089,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     p.rooms.slice(1).forEach(function(r){s+='<rect x="'+r[0]+'" y="'+r[1]+'" width="'+(r[2]-r[0])+'" height="'+(r[3]-r[1])+'" fill="none" stroke="#13233a" stroke-width=".55"/>'});
     return s+'</svg>'}
   function usd(n){return '$'+n.toLocaleString('en-US')}
+  window.UBCPL=PL;window.UBCplanSvg=planSvg;window.UBCusd=usd;
   // --- price breakdown (illustrative split, always sums to the plan price)
   var BR=[['Architectural plans & elevations',.34],['Steel framing model (BIM)',.28],['Shop drawings & cut list',.24],['Machine files',.14]];
   var pb=$('#pbBars');if(pb){var MAX=500,tot=1290,cols=BR.map(function(b,i){return {n:b[0],v:Math.round(1290*b[1]),k:['A','B','C','D'][i]}});
@@ -1119,32 +1117,6 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     d.addEventListener('drop',function(e){var f=e.dataTransfer.files[0];if(f)fn(f,d)});inp.addEventListener('change',function(){if(inp.files[0])fn(inp.files[0],d)})}
   wireDrop($('#drop'),$('#dropIn'),runSearch);
   wireDrop($('#drop2'),$('#dropIn2'),function(f,d){d.classList.add('busy');setTimeout(function(){d.classList.remove('busy');d.querySelector('b').textContent='Received "'+f.name+'". We will quote it.';var m=$('#m');if(m&&!/uploaded/i.test(m.value))m.value=(m.value?m.value+'\n':'')+'I uploaded my own plan ('+f.name+') on your site. Please quote it.';setTimeout(function(){$('#contact').scrollIntoView({behavior:'smooth'})},900)},1500)});
-  // --- markup & redraw
-  var ms=$('#modStage'),sv=$('#modSvg'),pins=$('#pins'),pop=$('#pop'),tx=$('#popTx'),revs=$('#revs'),ap=$('#applyBtn'),PINS=[],cur=null,base=PL[0];
-  var R0=[{n:'Living / kitchen',r:[0,0,22,13]},{n:'Dining',r:[22,0,40,13]},{n:'Bedroom 2',r:[0,13,12,26]},{n:'Bath',r:[12,13,19,26]},{n:'Master',r:[19,13,32,26]},{n:'Suite bath',r:[32,13,40,26]}];
-  var VX=10,VY=14,K=9;function bx(v){return VX+v*K}function by(v){return VY+v*K}
-  function buildPlan(){var s='<rect x="'+bx(0)+'" y="'+by(0)+'" width="'+40*K+'" height="'+26*K+'" fill="#fff" stroke="#13233a" stroke-width="3.2"/>';
-    R0.forEach(function(o,i){var r=o.r;s+='<g class="grow" id="rm'+i+'"><rect x="'+bx(r[0])+'" y="'+by(r[1])+'" width="'+(r[2]-r[0])*K+'" height="'+(r[3]-r[1])*K+'" fill="rgba(46,106,142,.05)" stroke="#13233a" stroke-width="1.6"/><text x="'+(bx(r[0])+6)+'" y="'+(by(r[1])+14)+'" font-size="9" fill="#5B6B78" font-family="JetBrains Mono,monospace">'+o.n.toUpperCase()+'</text></g>'});
-    s+='<g id="adds"></g>';sv.innerHTML=s}
-  buildPlan();
-  function which(x,y){var vx=(x-VX)/K,vy=(y-VY)/K;for(var i=R0.length-1;i>=0;i--){var r=R0[i].r;if(vx>=r[0]&&vx<=r[2]&&vy>=r[1]&&vy<=r[3])return i}return -1}
-  ms.addEventListener('click',function(e){if(e.target.closest('.pop,.pin'))return;var b=ms.getBoundingClientRect(),px=e.clientX-b.left,py=e.clientY-b.top,svgR=sv.getBoundingClientRect(),sx=(e.clientX-svgR.left)/svgR.width*400,sy=(e.clientY-svgR.top)/svgR.height*260;
-    cur={px:px,py:py,rm:which(sx,sy),sx:sx,sy:sy};pop.style.left=Math.min(px+14,b.width-pop.offsetWidth-8>0?b.width-250:px)+'px';pop.style.top=Math.min(py+10,b.height-110)+'px';pop.hidden=false;tx.value='';tx.focus()});
-  $('#popX').onclick=function(e){e.stopPropagation();pop.hidden=true;cur=null};
-  function addPin(){var t=tx.value.trim();if(!t||!cur)return;var n=PINS.length+1,el=document.createElement('div');el.className='pin';el.style.left=cur.px+'px';el.style.top=cur.py+'px';el.innerHTML='<span>'+n+'</span>';pins.appendChild(el);requestAnimationFrame(function(){el.classList.add('in')});
-    PINS.push({t:t,rm:cur.rm,sx:cur.sx,sy:cur.sy,el:el});if(revs.querySelector('.empty'))revs.innerHTML='';var li=document.createElement('li');li.innerHTML='<i>'+n+'</i><span>'+t.replace(/</g,'&lt;')+'</span>';revs.appendChild(li);PINS[n-1].li=li;pop.hidden=true;cur=null;ap.disabled=false}
-  $('#popOk').onclick=function(e){e.stopPropagation();addPin()};tx.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addPin()}});
-  function rcenter(i){var r=R0[i].r;return [bx((r[0]+r[2])/2),by((r[1]+r[3])/2)]}
-  function apply(p,delay){setTimeout(function(){var t=p.t.toLowerCase(),i=p.rm,g=i>=0?sv.querySelector('#rm'+i):null,add=sv.querySelector('#adds'),x=p.sx,y=p.sy,ns='';
-    if(/bigger|larger|expand|wider|more space|enlarge/.test(t)&&g){var c=rcenter(i);g.style.transformOrigin=c[0]+'px '+c[1]+'px';g.style.transform='scale(1.14)';g.style.filter='drop-shadow(0 0 8px rgba(179,21,43,.5))';setTimeout(function(){g.style.filter=''},1400)}
-    else if(/window/.test(t)){ns='<g class="mn"><rect x="'+(x-16)+'" y="'+(y-3)+'" width="32" height="6" fill="#fff" stroke="#13233a" stroke-width="1.2"/><line x1="'+(x-16)+'" y1="'+y+'" x2="'+(x+16)+'" y2="'+y+'" stroke="#2e6a8e" stroke-width="1.2"/></g>'}
-    else if(/door|entry|opening/.test(t)){ns='<g class="mn"><line x1="'+x+'" y1="'+y+'" x2="'+(x+22)+'" y2="'+y+'" stroke="#13233a" stroke-width="1.6"/><path d="M'+(x+22)+' '+y+' A22 22 0 0 0 '+x+' '+(y-22)+'" fill="none" stroke="#13233a" stroke-width="1"/></g>'}
-    else if(/island|kitchen/.test(t)){ns='<g class="mn"><rect x="'+(x-24)+'" y="'+(y-8)+'" width="48" height="16" rx="2" fill="#fff" stroke="#13233a" stroke-width="1.3"/></g>'}
-    else if(/walk|closet|storage|pantry/.test(t)){ns='<g class="mn"><rect x="'+(x-18)+'" y="'+(y-14)+'" width="36" height="28" fill="rgba(46,106,142,.08)" stroke="#13233a" stroke-width="1.4"/><line x1="'+(x-18)+'" y1="'+(y-14)+'" x2="'+(x+18)+'" y2="'+(y+14)+'" stroke="#9aa6b0" stroke-width=".8"/></g>'}
-    else{ns='<g class="mn"><ellipse cx="'+x+'" cy="'+y+'" rx="34" ry="22" fill="none" stroke="#B3152B" stroke-width="1.6" stroke-dasharray="5 4"/></g>'}
-    if(ns){add.insertAdjacentHTML('beforeend',ns);var n=add.lastChild;n.style.opacity='0';n.style.transition='opacity .6s';n.style.filter='drop-shadow(0 0 8px rgba(179,21,43,.6))';requestAnimationFrame(function(){n.style.opacity='1'});setTimeout(function(){n.style.filter=''},1400)}
-    p.el.classList.add('done');p.li.classList.add('ok')},delay)}
-  ap.onclick=function(){ap.disabled=true;PINS.filter(function(p){return !p.done}).forEach(function(p,k){p.done=true;apply(p,k*700)});$('#modNote').textContent='Redrawn. Happy with it? Send it to our team and we will price the revised plan.';ap.textContent='Send revisions to UBC';ap.onclick=function(){var m=$('#m');m.value=(m.value?m.value+'\n':'')+'Plan changes: '+PINS.map(function(p,i){return (i+1)+') '+p.t}).join('; ');$('#contact').scrollIntoView({behavior:'smooth'})};setTimeout(function(){ap.disabled=false},PINS.length*700+300)};
 })();
 
 
@@ -1446,7 +1418,9 @@ new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){start();i
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<link rel="stylesheet" href="modify.css">
 <script src="animations.js"></script>
+<script src="modify.js"></script>
 
 </body>
 </html>

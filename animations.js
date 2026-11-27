@@ -150,7 +150,7 @@
     tl.from($('.sh-bar', sec), { clipPath: 'inset(0 100% 0 0)', opacity: 0, duration: 1, ease: 'power4.inOut' })
       .add(function () { headingIn($('h2.lead', sec)); }, '-=0.6')
       .from($('.sub', sec), { y: 20, opacity: 0, duration: 0.8 }, '-=0.5');
-    var blocks = $$('.finder, .mod, .bring-grid > .drop', sec);
+    var blocks = $$('.finder, .m2-pick, .m2-win, .bring-grid > .drop', sec);
     if (blocks.length) { blocks.forEach(function (b) { b.classList.add('in'); }); tl.from(blocks, { y: 50, opacity: 0, duration: 1, stagger: 0.12 }, '-=0.5'); }
     var cards = $$('.c3', sec);
     if (cards.length) tl.from(cards, { y: 60, opacity: 0, rotateY: -12, transformPerspective: 800, duration: 1, stagger: 0.14 }, '-=0.6');
