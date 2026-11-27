@@ -126,19 +126,29 @@
       scrollTrigger: { trigger: '#story', start: 'top 70%', once: true } });
   }
 
-  /* ---- upload / 3D model section ---- */
-  var stage = $('#p2mStage');
-  if (stage) {
-    gsap.from(stage, { clipPath: 'inset(12% 12% 12% 12% round 28px)', scale: 0.9, opacity: 0, duration: 1.6, ease: EASE,
-      scrollTrigger: { trigger: stage, start: 'top 85%', once: true } });
-    gsap.to(stage, { yPercent: -4, ease: 'none', scrollTrigger: { trigger: stage, start: 'top bottom', end: 'bottom top', scrub: true } });
-    gsap.from($$('#p2m .p2m-key > div'), { y: 40, opacity: 0, duration: 0.9, ease: EASE, stagger: 0.14,
-      scrollTrigger: { trigger: '.p2m-key', start: 'top 90%', once: true } });
+  /* ---- footer: reveal + parallax layers that move at different speeds while you scroll ---- */
+  var foot = $('#foot');
+  if (foot) {
+    var scrub = function (trigger, start, end) { return { trigger: trigger, start: start, end: end, scrub: 0.6 }; };
+    headingIn($('.hf-3d-head h2', foot), $('.hf-3d', foot));
+    gsap.from($$('.hf-3d-head .tag, .hf-3d-head p', foot), { y: 26, opacity: 0, duration: 1, ease: EASE, stagger: 0.15,
+      scrollTrigger: { trigger: '.hf-3d', start: 'top 82%', once: true } });
+    // the rounded black sheet flattens as it arrives
+    gsap.fromTo(foot, { borderTopLeftRadius: 56, borderTopRightRadius: 56 }, { borderTopLeftRadius: 0, borderTopRightRadius: 0, ease: 'none',
+      scrollTrigger: scrub(foot, 'top bottom', 'top 35%') });
+    // the white dots and plan drift slower than the page and settle as you arrive
+    gsap.fromTo('#p2mStage', { yPercent: -7, scale: 1.06 }, { yPercent: 4, scale: 1, ease: 'none', scrollTrigger: scrub(foot, 'top bottom', 'top 5%') });
+    gsap.from($$('#foot .p2m-key > div'), { y: 36, opacity: 0, duration: 0.9, ease: EASE, stagger: 0.12,
+      scrollTrigger: { trigger: '.p2m-key', start: 'top 95%', once: true } });
+    // contact columns rise at three different speeds
+    $$('#foot .hf-grid > p').forEach(function (col, i) {
+      gsap.fromTo(col, { y: 70 + i * 55, opacity: 0.2 }, { y: 0, opacity: 1, ease: 'none', scrollTrigger: scrub('.hf-grid', 'top 105%', 'top 55%') });
+    });
+    gsap.from('.hf-cta', { yPercent: 60, opacity: 0, duration: 1, ease: 'back.out(1.6)', scrollTrigger: { trigger: '.hf-cta', start: 'top 95%', once: true } });
+    gsap.from('.hf-copy', { opacity: 0, y: 20, duration: 1, ease: EASE, scrollTrigger: { trigger: '.hf-copy', start: 'top 100%', once: true } });
+    // the outlined wordmark slides sideways as the footer scrolls into view
+    gsap.fromTo('.hf-mark span', { xPercent: 4 }, { xPercent: -34, ease: 'none', scrollTrigger: scrub(foot, 'top bottom', 'bottom bottom') });
   }
-
-  /* ---- footer ---- */
-  gsap.from($$('.hf .hw'), { y: 40, opacity: 0, duration: 1, ease: EASE, stagger: 0.14,
-    scrollTrigger: { trigger: '.hf', start: 'top 85%', once: true } });
 
   /* ---- sub pages (shop / modify / bring) animate each time they are opened ---- */
   var seen = new WeakSet();
