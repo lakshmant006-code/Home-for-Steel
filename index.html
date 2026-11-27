@@ -1139,14 +1139,14 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     for(var i=0;i<n;i++){mx[i]=M[i*4]/10-gx;my[i]=M[i*4+1]/10-gy;mz[i]=M[i*4+2]/10-gz;mt[i]=M[i*4+3]}
     /* streaming dots land on the bottom fifth of the model (they leave from the top edge of the plan) */
     var by0=1e9,by1=-1e9;for(var i=0;i<n;i++){if(my[i]<by0)by0=my[i];if(my[i]>by1)by1=my[i]}var cut=by0+(by1-by0)*.22,BOT=[];for(var i=0;i<n;i++)if(my[i]<cut)BOT.push(i);if(!BOT.length)BOT.push(0);
-    ST=[];for(var i=0;i<7500;i++)ST.push({k:BOT[(Math.random()*BOT.length)|0],ph:Math.random(),sp:.16+Math.random()*.16,j:Math.random()});buildPlan();ready=true}
+    ST=[];for(var i=0;i<(innerWidth<760?3000:7500);i++)ST.push({k:BOT[(Math.random()*BOT.length)|0],ph:Math.random(),sp:.16+Math.random()*.16,j:Math.random()});buildPlan();ready=true}
   var GS=2,GW=0,GH=0,zb=null;
   function ez(u){return u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2}
   function proj(i,ca,sa,cp,sp,f,D,cx,cy,o){var x=mx[i]*ca-mz[i]*sa,z=mx[i]*sa+mz[i]*ca,y=my[i],y2=y*cp-z*sp,z2=-(z*cp+y*sp),k=f/(D+z2);o[0]=cx+x*k;o[1]=cy-y2*k;o[2]=z2}
   var out=[0,0,0];
   function draw(now){if(!vis){raf=0;return}raf=requestAnimationFrame(draw);var t=(now-t0)/1000;ctx.setTransform(DP,0,0,DP,0,0);ctx.clearRect(0,0,W,H);ctx.drawImage(PC,0,0,W,H);
 
-    var ang=t*.3+.6,ca=Math.cos(ang),sa=Math.sin(ang),P0=.36,cp=Math.cos(P0),sp=Math.sin(P0),D=420,f=Math.min(bH.w*2.5,bH.h*5.6),cx=bH.x+bH.w/2,cy=bH.y+bH.h*.5;
+    var ang=t*.3+.6,ca=Math.cos(ang),sa=Math.sin(ang),P0=.36,cp=Math.cos(P0),sp=Math.sin(P0),D=420,f=Math.min(bH.w*2.5,bH.h*5.6)*(W<760?1.55:1),cx=bH.x+bH.w/2,cy=bH.y+bH.h*(W<760?.3:.5) /* phones: bigger model, nudged up toward the button */;
     GW=Math.ceil(W/GS)+2;GH=Math.ceil(H/GS)+2;if(!zb||zb.length!==GW*GH)zb=new Float32Array(GW*GH);zb.fill(1e9);
     var xs=new Float32Array(NM),ys=new Float32Array(NM);
     for(var i=0;i<NM;i++){proj(i,ca,sa,cp,sp,f,D,cx,cy,out);xs[i]=out[0];ys[i]=out[1];dpt[i]=out[2];if(mt[i]<256){var gi=((ys[i]/GS)|0)*GW+((xs[i]/GS)|0);if(gi>=0&&gi<zb.length&&out[2]<zb[gi])zb[gi]=out[2]}}
@@ -1368,7 +1368,9 @@ new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){start();i
 <link rel="stylesheet" href="footer.css">
 <link rel="stylesheet" href="cursor.css">
 <link rel="stylesheet" href="hero.css">
+<link rel="stylesheet" href="sections.css">
 <script src="animations.js"></script>
 <script src="modify.js"></script>
+<script src="story.js"></script>
 </body>
 </html>
