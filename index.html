@@ -963,8 +963,7 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
   <div class="sk-cap" id="skCap"></div>
   <div class="sk-prog" id="skProg"><i></i></div>
   <div class="sk-bar" id="skBar"><button type="button" class="sk-go" id="hSkip">Sketch your own plan</button><button type="button" class="sk-go pri" id="hFinish">Finish drawing</button><button type="button" class="sk-go pri" id="hExtrude">Extrude to 3D</button><button type="button" class="sk-go" id="hBack">Back to plan</button><button type="button" class="sk-go" id="hClear">Clear</button></div>
-  <div class="htop"><h1>Your trusted source for ready-to-construct steel-framed home plans.</h1><p>From single family homes, sheds and ADUs to any custom design and personalised steel home plans.</p>
-  </div>
+  <div class="htop"><h1>Your trusted source for ready-to-construct steel-framed home plans.</h1>  </div>
 </header>
 
 
@@ -995,11 +994,6 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
 </section>
 
 
-<section class="p2m wrap sheet" id="p2m">
-  <div class="sh-head"><div class="ctr"></div><div class="mid"><span class="tag"><b>UPLOAD</b>Plan in, model out</span><h2 class="reveal">Upload a plan. We build the 3D model.</h2><p>Rooms, walls and openings are read from your drawing and rebuilt as a model you can walk around.</p></div><div class="ctr b"></div></div>
-  <div class="p2m-stage" id="p2mStage"><canvas id="p2mCv" role="img" aria-label="A floor plan dissolving into dots that reassemble as a 3D house"></canvas></div>
-  <div class="p2m-key"><div><b>01</b><span>Your plan, as uploaded</span></div><div><b>02</b><span>Read into points, walls and openings</span></div><div><b>03</b><span>Rebuilt as a 3D model</span></div></div>
-</section>
 
 
 
@@ -1044,6 +1038,11 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
   <p class="arch">Architect? <a href="#contact">Upload your plans and sell them on UBC</a> (coming soon).</p>
 </section></div>
 <footer class="hf" id="foot"><span id="contact"></span>
+  <div class="hf-3d" id="p2m">
+    <div class="hf-3d-head"><span class="tag"><b>UPLOAD</b>Plan in, model out</span><h2>Upload a plan. We build the 3D model.</h2><p>Rooms, walls and openings are read from your drawing and rebuilt as a model you can walk around.</p></div>
+    <div class="p2m-stage" id="p2mStage"><canvas id="p2mCv" role="img" aria-label="A floor plan dissolving into white dots that reassemble as a 3D house"></canvas></div>
+    <div class="p2m-key"><div><b>01</b><span>Your plan, as uploaded</span></div><div><b>02</b><span>Read into points, walls and openings</span></div><div><b>03</b><span>Rebuilt as a 3D model</span></div></div>
+  </div>
   <div class="hf-in">
     <h2 class="sr">Request a custom plan</h2>
     <div class="hs-stage" id="hsStage" aria-hidden="true"><i class="hs-rail l"></i><i class="hs-rail r"></i><svg class="hs-ink" id="hsInk"></svg><i class="hs-beam" id="hsBeam"></i><i class="hs-blk l" id="hsBl"></i><i class="hs-blk r" id="hsBr"></i><svg class="hs-car" id="hsCar" viewBox="0 0 120 150" width="58" height="72" aria-hidden="true"><defs><linearGradient id="hfb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4d6479"/><stop offset=".6" stop-color="#2f4559"/><stop offset="1" stop-color="#1c2c3b"/></linearGradient><linearGradient id="hfp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d7d8da"/><stop offset=".4" stop-color="#fff"/><stop offset="1" stop-color="#c4c6ca"/></linearGradient></defs>
@@ -1053,13 +1052,15 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
 <g class="hf-red"><circle cx="70" cy="110" r="14" fill="#cfc6ae"/><circle cx="70" cy="110" r="10" fill="#f0562f"/><circle cx="70" cy="100" r="1.6" fill="#8c8470"/><circle cx="80" cy="110" r="1.6" fill="#8c8470"/><circle cx="70" cy="120" r="1.6" fill="#8c8470"/><circle cx="60" cy="110" r="1.6" fill="#8c8470"/></g>
 <g class="hf-dial"><circle cx="98" cy="118" r="10" fill="#e3c142"/><rect x="97" y="109" width="2" height="6" fill="#6b5a2b"/></g>
 <g class="hf-w"><circle cx="30" cy="144" r="7" fill="#2a2a2c"/><rect x="26" y="143" width="8" height="2" fill="#9a9a9c"/></g><g class="hf-w"><circle cx="90" cy="144" r="7" fill="#2a2a2c"/><rect x="86" y="143" width="8" height="2" fill="#9a9a9c"/></g></svg></div>
-    <div class="hf-grid hw">
-      <p>UBC Technology Services Inc<br>885 Gold Hill Rd #3083<br>Fort Mill, SC 29708</p>
-      <p>+1 (214) 444-6150<br>marketing@homeplansforsteel.com</p>
-      <p class="hf-l">Home · Shop BIM Models · How It Works<br>Industries We Serve · About Us · Contact Us</p>
+    <a class="hf-cta" href="mailto:marketing@homeplansforsteel.com?subject=Custom%20plan%20request">Request a custom plan <span aria-hidden="true">&rarr;</span></a>
+    <div class="hf-grid">
+      <p><b class="hf-h">Visit</b>UBC Technology Services Inc<br>885 Gold Hill Rd #3083<br>Fort Mill, SC 29708</p>
+      <p><b class="hf-h">Talk to us</b><a href="tel:+12144446150">+1 (214) 444-6150</a><br><a href="mailto:marketing@homeplansforsteel.com">marketing@homeplansforsteel.com</a></p>
+      <p class="hf-l"><b class="hf-h">Explore</b><a href="#top">Home</a> · <a href="#shop">Shop plans</a> · <a href="#modify">Modify a plan</a><br><a href="#bring">Upload yours</a> · <a href="#clear">Pricing</a> · <a href="#story">How it works</a></p>
     </div>
-    <div class="hf-copy hw">© UBC. All rights reserved. Design preview: the form does not send anything.</div>
+    <div class="hf-copy">© UBC. All rights reserved. Design preview: the form does not send anything.</div>
   </div>
+  <div class="hf-mark" aria-hidden="true"><span>HOME PLANS FOR STEEL &nbsp;·&nbsp; HOME PLANS FOR STEEL &nbsp;·&nbsp; HOME PLANS FOR STEEL</span></div>
 </footer>
 <script>
 (function(){
@@ -1144,7 +1145,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
   function buildPlan(){var w=640,h=Math.round(640*pimg.naturalHeight/pimg.naturalWidth),c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d',{willReadFrequently:true});x.drawImage(pimg,0,0,w,h);var d=x.getImageData(0,0,w,h).data,pool=[];
     for(var y=0;y<h;y++)for(var xx=0;xx<w;xx++){if(d[(y*w+xx)*4+3]>110)pool.push([xx/w,y/h])}
     PL=[];for(var i=0;i<16000;i++){var p=pool[(Math.random()*pool.length)|0];PL.push([p[0]+(Math.random()-.5)/w,p[1]+(Math.random()-.5)/h])}}
-  function renderPlan(){PC=document.createElement('canvas');PC.width=W*DP;PC.height=H*DP;var c=PC.getContext('2d');c.setTransform(DP,0,0,DP,0,0);c.drawImage(pimg,bP.x,bP.y,bP.w,bP.h)}
+  function renderPlan(){PC=document.createElement('canvas');PC.width=W*DP;PC.height=H*DP;var c=PC.getContext('2d');c.setTransform(DP,0,0,DP,0,0);c.drawImage(pimg,bP.x,bP.y,bP.w,bP.h);c.globalCompositeOperation='source-in';c.fillStyle='#fff';c.fillRect(0,0,W,H)}
   function layout(){DP=Math.min(2,devicePixelRatio||1);W=st.clientWidth;H=st.clientHeight;cv.width=W*DP;cv.height=H*DP;var pad=20,ar=pimg.naturalWidth/pimg.naturalHeight,ph=Math.min(H*.1,(W-pad*2)*.26/ar),pw=ph*ar;bP={x:(W-pw)/2,y:H-pad-ph-6,w:pw,h:ph};bH={x:pad,y:pad,w:W-pad*2,h:H-pad*2-ph-6};renderPlan()}
   function init(){var n=Math.min(M.length/4|0,84000);mx=new Float32Array(n);my=new Float32Array(n);mz=new Float32Array(n);mt=new Uint16Array(n);dpt=new Float32Array(n);NM=n;
     var x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,z0=1e9,z1=-1e9;for(var i=0;i<n;i++){var X=M[i*4]/10,Y=M[i*4+1]/10,Z=M[i*4+2]/10;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;if(Z<z0)z0=Z;if(Z>z1)z1=Z}
@@ -1165,10 +1166,10 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     for(var i=0;i<NM;i++){var gi=((ys[i]/GS)|0)*GW+((xs[i]/GS)|0);if(i%4===3)continue;var gh=mt[i]>=256;if(gh){if(i&1)continue}else if(gi<0||gi>=zb.length||dpt[i]>zb[gi]+2.4)continue;
       var dl=(mx[i]*7.3+mz[i]*3.1)%1;dl=dl<0?dl+1:dl;var q=Math.min(1,Math.max(0,build*1.5-dl*.5));if(q<=0)continue;var e=ez(q),x=xs[i],y=ys[i];
       if(q<1){var pp=PL[i%PL.length],a=pmap(pp[0],pp[1]);x=a[0]+(x-a[0])*e;y=a[1]+(y-a[1])*e-Math.sin(Math.PI*e)*H*.08}
-      var dep=1-Math.max(0,Math.min(1,(dpt[i]+60)/120));var tn=mt[i]&255;ctx.globalAlpha=q<1?Math.min(1,e*3):(gh?.3+.3*dep:.6+.4*dep);ctx.fillStyle='#000';ctx.fillRect(x,y,.78,.78)}
+      var dep=1-Math.max(0,Math.min(1,(dpt[i]+60)/120));var tn=mt[i]&255;ctx.globalAlpha=q<1?Math.min(1,e*3):(gh?.3+.3*dep:.6+.4*dep);ctx.fillStyle='#fff';ctx.fillRect(x,y,.78,.78)}
     // continuous stream: dots leave the plan all the time and land on the model
     for(var s=0;s<ST.length;s++){var p=ST[s],u=(t*p.sp+p.ph)%1;var k=p.k;proj(k,ca,sa,cp,sp,f,D,cx,cy,out);var a=pmap(PL[s%PL.length][0],PL[s%PL.length][1]),e=ez(Math.min(1,u*1.25)),x=a[0]+(out[0]-a[0])*e,y=a[1]+(out[1]-a[1])*e-Math.sin(Math.PI*e)*H*.1*(.4+p.j);
-      ctx.globalAlpha=u<.08?u/.08:u>.85?(1-u)/.15:1;ctx.fillStyle='#000';ctx.fillRect(x,y,.75,.75)}
+      ctx.globalAlpha=u<.08?u/.08:u>.85?(1-u)/.15:1;ctx.fillStyle='#fff';ctx.fillRect(x,y,.75,.75)}
     ctx.globalAlpha=1}
   function start(){if(!vis||raf||!ready)return;if(!t0)t0=performance.now()-3200;raf=requestAnimationFrame(draw)}
   function done(){if(!pimg.complete||!M||ready)return;init();layout();if(RMm){vis=true;t0=performance.now()-6000;draw(performance.now());vis=false}else start()}
@@ -1209,7 +1210,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
   var NS='http://www.w3.org/2000/svg',K=2.5,SLANT=.16,BASE=72,paths=[],W=0,X0=0,pen={x:0,y:0},cum=0,state='idle';
   function tf(d,ox){ // scale, flip y, slant, translate
     return d.replace(/([MLC])([^MLC]*)/g,function(_,c,args){var n=args.trim().split(/[\s,]+/).map(Number),o=[];for(var i=0;i<n.length;i+=2){var x=n[i],y=n[i+1];o.push(((ox+x+SLANT*y)*K).toFixed(1)+' '+(BASE-y*K).toFixed(1))}return c+o.join(' ')})}
-  function build(){inkSvg.innerHTML='';paths=[];var ox=0;for(var i=0;i<TXT.length;i++){var g=G[TXT[i]];if(!g)continue;g[1].forEach(function(d){var p=document.createElementNS(NS,'path');p.setAttribute('d',tf(d,ox));p.setAttribute('fill','none');p.setAttribute('stroke','#13233a');p.setAttribute('stroke-width','2.7');p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');inkSvg.appendChild(p);var L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;paths.push({p:p,L:L})});ox+=g[0]+1.1}
+  function build(){inkSvg.innerHTML='';paths=[];var ox=0;for(var i=0;i<TXT.length;i++){var g=G[TXT[i]];if(!g)continue;g[1].forEach(function(d){var p=document.createElementNS(NS,'path');p.setAttribute('d',tf(d,ox));p.setAttribute('fill','none');p.setAttribute('stroke','#ffffff');p.setAttribute('stroke-width','2.7');p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');inkSvg.appendChild(p);var L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;paths.push({p:p,L:L})});ox+=g[0]+1.1}
     W=(ox+3)*K+10;inkSvg.setAttribute('width',W);inkSvg.setAttribute('height',110);inkSvg.setAttribute('viewBox','0 0 '+W+' 110');
     X0=(stage.clientWidth-W)/2;inkSvg.style.left=X0+'px'}
   function place(x,y){pen.x=x;pen.y=y;car.style.left=(X0+x-29)+'px';car.style.top=(y-3)+'px';var by=y+50;beam.style.top=by+'px';blkL.style.top=blkR.style.top=(by-12)+'px';
@@ -1251,7 +1252,7 @@ var penSpeed=0;
 function sound(){if(!snd.ok)return;var t=snd.ctx.currentTime,tg=snd.muted||!vis||document.hidden?0:Math.min(.1,penSpeed*.0004);snd.g.gain.setTargetAtTime(tg,t,.14);snd.src.playbackRate.setTargetAtTime(.9+Math.min(.3,penSpeed*.0008),t,.2)}
 /* ---------- layout ---------- */
 function layout(){DP=Math.min(2,devicePixelRatio||1);W=hero.clientWidth;H=hero.clientHeight;cv.width=W*DP;cv.height=H*DP;
-  var en=hero.querySelector('.htop > p'),hr=hero.getBoundingClientRect(),eb=en?en.getBoundingClientRect().bottom-hr.top:H*.4,top=Math.round(eb+26),bot=H-(W<700?92:74),x0=W<700?10:Math.max(24,W*.06);
+  var en=hero.querySelector('.htop > h1'),hr=hero.getBoundingClientRect(),eb=en?en.getBoundingClientRect().bottom-hr.top:H*.4,top=Math.round(eb+26),bot=H-(W<700?92:74),x0=W<700?10:Math.max(24,W*.06);
   PR={x:x0,y:top,w:W-x0*2,h:Math.max(170,bot-top)};pad.style.left=PR.x+'px';pad.style.top=PR.y+'px';pad.style.width=PR.w+'px';pad.style.height=PR.h+'px';
   hint.style.left=PR.x+'px';hint.style.top=PR.y+'px';hint.style.width=PR.w+'px';hint.style.height=PR.h+'px';
   paper=document.createElement('canvas');paper.width=W*DP;paper.height=H*DP;var p=paper.getContext('2d');p.setTransform(DP,0,0,DP,0,0);p.fillStyle='#fbfcfd';p.fillRect(0,0,W,H);
@@ -1419,6 +1420,7 @@ new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){start();i
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 <link rel="stylesheet" href="modify.css">
+<link rel="stylesheet" href="footer.css">
 <script src="animations.js"></script>
 <script src="modify.js"></script>
 
