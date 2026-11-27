@@ -23,7 +23,9 @@
 .capi p{color:#5b6670;max-width:440px;font-size:16px;line-height:1.55;margin:0}
 .capi .capn{font:500 12px "JetBrains Mono",monospace;letter-spacing:.1em;color:#9aa3ab}
 @media(min-width:861px){                                  /* desktop: caption sits on the left and stays while the cards scroll */
-  .sg-cap{order:-1;position:sticky;top:64px;height:calc(100vh - 64px);margin-bottom:calc(64px - 100vh);padding:0 34px}
+  /* the caption's height is cancelled by pulling the first step up by the same amount, so the caption always stays inside its section */
+  .sg-cap{order:-1;position:sticky;top:64px;height:calc(100vh - 64px);padding:0 34px}
+  .sg-l>.st:first-child{margin-top:calc(64px - 100vh)}
 }
 @media(max-width:860px){                                  /* phones: caption pinned along the bottom of the screen */
   .st{min-height:44vh;padding:0}
@@ -34,4 +36,13 @@
   .capi{justify-content:flex-start;gap:8px}
   .capi h3{font-size:clamp(22px,6vw,27px)}
   .capi p{font-size:14.5px}
+}
+
+/* ---- phones/tablets: keep the sticky "Request a custom plan" button visible beside the hamburger ---- */
+@media(max-width:900px){
+  nav{grid-template-columns:1fr auto auto!important;gap:8px!important}
+  nav .nr{display:flex!important;align-items:center}
+  nav .nr .nlk{display:none}
+  nav .nr .npill{margin-left:0;padding:9px 13px;font-size:13px}
+  .npanel{z-index:60}
 }
