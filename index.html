@@ -955,6 +955,7 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
 </nav>
 <div id="home">
 <header class="hero" id="top">
+  <video class="hero-video" id="heroVideo" src="assets/hero/hero.mp4" poster="assets/hero/poster.webp" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
   <canvas class="draft2" id="draft" aria-hidden="true"></canvas>
   <div class="shade"></div>
   <button type="button" class="snd" id="sndBtn" aria-label="Plotter sound" aria-pressed="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path class="w1" d="M16.5 9a4.2 4.2 0 0 1 0 6"/><path class="w2" d="M19 6.5a8 8 0 0 1 0 11"/><path class="x" d="M17 9l5 6M22 9l-5 6"/></svg></button>
@@ -1013,7 +1014,7 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
       <div><b>Drop a hand sketch or architect plan</b><span>We read it and show the closest plans we already have</span></div>
       <div class="scan" id="scan"><i></i></div>
     </div>
-    <div class="chips2" id="fchips"><button class="on" data-f="all">All</button><button data-f="single">Single family</button><button data-f="multi">Multi-family</button><button data-f="adu">ADU / tiny</button><button data-f="garage">Garage / pod</button></div>
+    <div class="chips2" id="fchips" hidden><button class="on" data-f="all">All</button><button data-f="single">Single family</button><button data-f="multi">Multi-family</button><button data-f="adu">ADU / tiny</button><button data-f="garage">Garage / pod</button></div>
   </div>
   <div class="pgrid" id="pgrid"></div>
   <div class="pdetail" id="pdetail" hidden></div>
@@ -1066,15 +1067,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
 /* ---------- plan flow: transparent pricing, closest-plan search, markup & redraw ---------- */
 (function(){
   var PL=[
-   {id:'p1',n:'Prairie 1850',t:'single',sf:1850,bd:3,ba:2,pr:1290,img:'single',rooms:[[0,0,40,26],[0,0,22,13],[22,0,40,13],[0,13,12,26],[12,13,19,26],[19,13,32,26],[32,13,40,26]]},
-   {id:'p2',n:'Cedar 2400',t:'single',sf:2400,bd:4,ba:3,pr:1590,img:'single',rooms:[[0,0,46,28],[0,0,24,14],[24,0,46,14],[0,14,14,28],[14,14,24,28],[24,14,34,28],[34,14,46,28]]},
-   {id:'p3',n:'Ridge 1450',t:'single',sf:1450,bd:2,ba:2,pr:990,img:'single',rooms:[[0,0,34,24],[0,0,20,12],[20,0,34,12],[0,12,12,24],[12,12,22,24],[22,12,34,24]]},
-   {id:'p4',n:'Row 3-Plex',t:'multi',sf:4200,bd:9,ba:7,pr:2890,img:'townhomes',rooms:[[0,0,48,24],[0,0,16,24],[16,0,32,24],[32,0,48,24],[0,12,16,12],[16,12,32,12],[32,12,48,12]]},
-   {id:'p5',n:'Duplex Side-by-Side',t:'multi',sf:3100,bd:6,ba:4,pr:2190,img:'townhomes',rooms:[[0,0,44,26],[0,0,22,26],[22,0,44,26],[0,13,22,13],[22,13,44,13]]},
-   {id:'p6',n:'Garden ADU 650',t:'adu',sf:650,bd:1,ba:1,pr:490,img:'adu',rooms:[[0,0,26,18],[0,0,16,18],[16,0,26,9],[16,9,26,18]]},
-   {id:'p7',n:'Studio ADU 420',t:'adu',sf:420,bd:0,ba:1,pr:350,img:'adu',rooms:[[0,0,22,16],[0,0,14,16],[14,8,22,16]]},
-   {id:'p8',n:'Two-Bay Garage',t:'garage',sf:720,bd:0,ba:0,pr:290,img:'garage',rooms:[[0,0,30,24],[15,0,15,24]]},
-   {id:'p9',n:'Bath Pod 8x10',t:'garage',sf:80,bd:0,ba:1,pr:190,img:'pod',rooms:[[0,0,16,20],[0,0,8,10],[8,10,16,20]]}];
+   {id:'r1',n:'Ranch 2520 with garage',t:'single',sf:2520,bd:3,ba:2,pr:1690,img:'single',plan:'assets/plans/ranch-2520.webp',rooms:[[0,0,59,52]]}];
   var NSv='http://www.w3.org/2000/svg';
   function planSvg(p,w){var W=0,H=0;p.rooms.forEach(function(r){W=Math.max(W,r[2]);H=Math.max(H,r[3])});var k=w/ (Math.max(W,H)||1);
     var s='<svg viewBox="-3 -3 '+(W+6)+' '+(H+6)+'" xmlns="'+NSv+'"><rect x="0" y="0" width="'+W+'" height="'+H+'" fill="none" stroke="#13233a" stroke-width="1.1"/>';
@@ -1090,14 +1083,14 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
   new IntersectionObserver(function(es){if(es[0].isIntersecting){[].forEach.call(pb.querySelectorAll('.bar'),function(i,k){setTimeout(function(){i.style.height=i.dataset.h+'%'},k*160)})}},{threshold:.3}).observe(pb)}
   // --- plan grid
   var grid=$('#pgrid'),det=$('#pdetail'),flt='all',ranks=null;
-  function card(p,i){var m=ranks&&ranks[p.id];return '<button type="button" class="pc" data-id="'+p.id+'" style="transition-delay:'+(i*45)+'ms"><div class="pim">'+(m?'<span class="match">'+m+'% match</span>':'')+'<img loading="lazy" alt="'+p.n+'" src="assets/types/'+p.img+'.webp">'+planSvg(p,200)+'</div><div class="m"><b>'+p.n+'</b><span class="pr">'+usd(p.pr)+'</span></div><small>'+(p.sf.toLocaleString())+' sq ft'+(p.bd?' · '+p.bd+' bed':'')+(p.ba?' · '+p.ba+' bath':'')+'</small></button>'}
+  function card(p,i){var m=ranks&&ranks[p.id];return '<button type="button" class="pc" data-id="'+p.id+'" style="transition-delay:'+(i*45)+'ms"><div class="pim">'+(m?'<span class="match">'+m+'% match</span>':'')+'<img loading="lazy" alt="'+p.n+'"'+(p.plan?' class="isplan"':'')+' src="'+(p.plan||('assets/types/'+p.img+'.webp'))+'">'+(p.plan?'':planSvg(p,200))+'</div><div class="m"><b>'+p.n+'</b><span class="pr">'+usd(p.pr)+'</span></div><small>'+(p.sf.toLocaleString())+' sq ft'+(p.bd?' · '+p.bd+' bed':'')+(p.ba?' · '+p.ba+' bath':'')+'</small></button>'}
   function draw(){var list=PL.filter(function(p){return flt==='all'||p.t===flt});if(ranks)list=list.slice().sort(function(a,b){return (ranks[b.id]||0)-(ranks[a.id]||0)});
     grid.innerHTML=list.map(card).join('');requestAnimationFrame(function(){[].forEach.call(grid.children,function(c){c.classList.add('in')})})}
   draw();
   $('#fchips').onclick=function(e){var b=e.target.closest('button');if(!b)return;flt=b.dataset.f;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)});draw()};
   grid.addEventListener('click',function(e){var c=e.target.closest('.pc');if(!c)return;var p=PL.filter(function(x){return x.id===c.dataset.id})[0];
     var ln=BR.map(function(b){return '<li><b>'+b[0]+'</b><span>'+usd(Math.round(p.pr*b[1]))+'</span></li>'}).join('');
-    det.innerHTML='<div class="pv">'+planSvg(p,400)+'<img alt="'+p.n+' elevation" src="assets/types/'+p.img+'.webp"></div><div><div class="mono">'+p.t+'</div><h3>'+p.n+'</h3><div class="big">'+usd(p.pr)+'</div><p class="mut">'+p.sf.toLocaleString()+' sq ft'+(p.bd?' · '+p.bd+' bed':'')+(p.ba?' · '+p.ba+' bath':'')+'. Price includes every file below.</p><ul class="files" style="margin-top:14px">'+ln+'</ul><p class="mut" style="margin-top:12px">All produced in-house by UBC. No contractor, no reseller.</p><div class="btnrow"><a class="btn" href="#contact">Buy this plan</a><a class="skb" href="#modify" style="display:inline-flex;align-items:center">Change it first</a></div></div>';
+    det.innerHTML='<div class="pv">'+(p.plan?'<img class="isplan" alt="'+p.n+' floor plan" src="'+p.plan+'" style="margin-top:0">':planSvg(p,400)+'<img alt="'+p.n+' elevation" src="assets/types/'+p.img+'.webp">')+'</div><div><div class="mono">'+p.t+'</div><h3>'+p.n+'</h3><div class="big">'+usd(p.pr)+'</div><p class="mut">'+p.sf.toLocaleString()+' sq ft'+(p.bd?' · '+p.bd+' bed':'')+(p.ba?' · '+p.ba+' bath':'')+'. Price includes every file below.</p><ul class="files" style="margin-top:14px">'+ln+'</ul><p class="mut" style="margin-top:12px">All produced in-house by UBC. No contractor, no reseller.</p><div class="btnrow"><a class="btn" href="#contact">Buy this plan</a><a class="skb" href="#modify" style="display:inline-flex;align-items:center">Change it first</a></div></div>';
     det.hidden=false;det.scrollIntoView({behavior:'smooth',block:'nearest'})});
   window.ubcRank=function(sf,beds){ranks={};PL.forEach(function(p){var d=Math.abs(Math.log(p.sf/sf))*1.3+Math.abs(p.bd-beds)*.1;ranks[p.id]=Math.max(41,Math.round(99-d*45))});flt='all';[].forEach.call($('#fchips').children,function(x){x.classList.toggle('on',x.dataset.f==='all')});draw()};
   // --- upload search (demo): deterministic mock until the real plan reader is connected
@@ -1147,7 +1140,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     for(var i=0;i<n;i++){mx[i]=M[i*4]/10-gx;my[i]=M[i*4+1]/10-gy;mz[i]=M[i*4+2]/10-gz;mt[i]=M[i*4+3]}
     /* streaming dots land on the bottom fifth of the model (they leave from the top edge of the plan) */
     var by0=1e9,by1=-1e9;for(var i=0;i<n;i++){if(my[i]<by0)by0=my[i];if(my[i]>by1)by1=my[i]}var cut=by0+(by1-by0)*.22,BOT=[];for(var i=0;i<n;i++)if(my[i]<cut)BOT.push(i);if(!BOT.length)BOT.push(0);
-    ST=[];for(var i=0;i<11000;i++)ST.push({k:BOT[(Math.random()*BOT.length)|0],ph:Math.random(),sp:.16+Math.random()*.16,j:Math.random()});buildPlan();ready=true}
+    ST=[];for(var i=0;i<16000;i++)ST.push({k:BOT[(Math.random()*BOT.length)|0],ph:Math.random(),sp:.16+Math.random()*.16,j:Math.random()});buildPlan();ready=true}
   var GS=2,GW=0,GH=0,zb=null;
   function ez(u){return u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2}
   function proj(i,ca,sa,cp,sp,f,D,cx,cy,o){var x=mx[i]*ca-mz[i]*sa,z=mx[i]*sa+mz[i]*ca,y=my[i],y2=y*cp-z*sp,z2=-(z*cp+y*sp),k=f/(D+z2);o[0]=cx+x*k;o[1]=cy-y2*k;o[2]=z2}
@@ -1164,8 +1157,10 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
       if(q<1){var pp=PL[i%PL.length],a=pmap(pp[0],pp[1]);x=a[0]+(x-a[0])*e;y=a[1]+(y-a[1])*e-Math.sin(Math.PI*e)*H*.08}
       var dep=1-Math.max(0,Math.min(1,(dpt[i]+60)/120));var tn=mt[i]&255;ctx.globalAlpha=q<1?Math.min(1,e*3):(gh?.3+.3*dep:.6+.4*dep);ctx.fillStyle='#fff';ctx.fillRect(x,y,.78,.78)}
     // continuous stream: dots leave the plan all the time and land on the model
-    for(var s=0;s<ST.length;s++){var p=ST[s],u=(t*p.sp+p.ph)%1;var k=p.k;proj(k,ca,sa,cp,sp,f,D,cx,cy,out);var pq=PL[s%PL.length],a=pmap(pq[0],W<760?pq[1]:pq[1]*.2),e=ez(Math.min(1,u*1.25)),x=a[0]+(out[0]-a[0])*e,y=a[1]+(out[1]-a[1])*e-Math.sin(Math.PI*e)*H*(W<760?.1:.03)*(.4+p.j);
-      ctx.globalAlpha=u<.08?u/.08:u>.85?(1-u)/.15:1;ctx.fillStyle='#fff';ctx.fillRect(x,y,.75,.75)}
+    for(var s=0;s<ST.length;s++){var p=ST[s],u=(t*p.sp+p.ph)%1;var k=p.k;proj(k,ca,sa,cp,sp,f,D,cx,cy,out);var pq=PL[s%PL.length],a=pmap(pq[0],pq[1]),e=ez(Math.min(1,u*1.25)),
+      rise=Math.sin(Math.min(1,u*4)*Math.PI/2)*(1-e)*H*.07*(.3+p.j), /* each dot first lifts straight off its own spot on the plan, from every wall and room */
+      x=a[0]+(out[0]-a[0])*e+(p.j-.5)*12*Math.sin(Math.PI*e),y=a[1]+(out[1]-a[1])*e-rise-Math.sin(Math.PI*e)*H*(W<760?.1:.03)*(.4+p.j);
+      ctx.globalAlpha=u<.08?u/.08:u>.85?(1-u)/.15:1;ctx.fillStyle='#fff';var sz=.7+p.j*.7;ctx.fillRect(x,y,sz,sz)}
     ctx.globalAlpha=1}
   function start(){if(!vis||raf||!ready)return;if(!t0)t0=performance.now()-3200;raf=requestAnimationFrame(draw)}
   function done(){if(!pimg.complete||!M||ready)return;init();layout();if(RMm){vis=true;t0=performance.now()-6000;draw(performance.now());vis=false}else start()}
@@ -1187,6 +1182,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
 
 /* ---------- hero: draw a house, watch it become a drafted plan, press one button to extrude it into 3D ---------- */
 (function(){
+if(document.getElementById('heroVideo'))return; /* the hero now plays the video instead of the sketch pad */
 var hero=$('#top'),cv=$('#draft'),ctx=cv.getContext('2d'),pad=$('#skPad'),hint=$('#skHint'),RMh=matchMedia('(prefers-reduced-motion:reduce)').matches;
 var G=16,FT=8; // grid px, pixels per foot (one grid square = 2 ft)
 var W=0,H=0,DP=1,PR={x:0,y:0,w:0,h:0},paper=null,vis=false,raf=0,lastT=0;
@@ -1375,8 +1371,17 @@ new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){start();i
 <link rel="stylesheet" href="modify.css">
 <link rel="stylesheet" href="footer.css">
 <link rel="stylesheet" href="cursor.css">
+<link rel="stylesheet" href="hero.css">
 <script src="animations.js"></script>
 <script src="modify.js"></script>
+<script>
+/* hero video: make sure it starts on every open of the home page (muted autoplay), still frame for reduced motion */
+(function(){var v=document.getElementById('heroVideo');if(!v)return;v.muted=true;
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){v.removeAttribute('autoplay');v.pause();return}
+var go=function(){var p=v.play();if(p&&p.catch)p.catch(function(){})};go();v.addEventListener('canplay',go);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)go()});
+addEventListener('hashchange',function(){if(!location.hash||location.hash==='#top')go()})})();
+</script>
 
 </body>
 </html>

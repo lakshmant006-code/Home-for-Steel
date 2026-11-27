@@ -1,0 +1,9 @@
+/* Hero: the plotter video plays whenever the home page is open; the older sketch pad is switched off */
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;z-index:0;background:#f4f6f8;pointer-events:none}
+.hero #draft,.hero .snd,.hero .sk-pad,.hero .sk-hint,.hero .sk-cap,.hero .sk-prog,.hero .sk-bar{display:none!important}
+.hero .shade{z-index:1}
+
+/* shop: the single plan is a drawing, so show all of it instead of cropping it */
+.pc .pim img.isplan{object-fit:contain;background:#fff;padding:6px}
+.pdetail .pv img.isplan{border:1px solid var(--line);background:#fff}
+.chips2[hidden]{display:none}
