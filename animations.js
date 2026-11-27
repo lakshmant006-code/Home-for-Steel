@@ -51,8 +51,7 @@
   var h1 = $('.hero h1');
   if (h1) {
     var tl = gsap.timeline({ defaults: { ease: EASE }, delay: 0.25 });
-    tl.from(splitWords(h1), { yPercent: 115, rotate: 5, duration: 1.3, stagger: 0.045 })
-      .from('.hero .htop > p', { y: 28, opacity: 0, duration: 1 }, '-=0.8');
+    tl.from(splitWords(h1), { yPercent: 115, rotate: 5, duration: 1.3, stagger: 0.045 });
     var back = { y: 0 };
     gsap.to('.hero .htop', {
       yPercent: -14, opacity: 0.2, ease: 'none',

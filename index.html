@@ -963,8 +963,7 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
   <div class="sk-cap" id="skCap"></div>
   <div class="sk-prog" id="skProg"><i></i></div>
   <div class="sk-bar" id="skBar"><button type="button" class="sk-go" id="hSkip">Sketch your own plan</button><button type="button" class="sk-go pri" id="hFinish">Finish drawing</button><button type="button" class="sk-go pri" id="hExtrude">Extrude to 3D</button><button type="button" class="sk-go" id="hBack">Back to plan</button><button type="button" class="sk-go" id="hClear">Clear</button></div>
-  <div class="htop"><h1>Your trusted source for ready-to-construct steel-framed home plans.</h1><p>From single family homes, sheds and ADUs to any custom design and personalised steel home plans.</p>
-  </div>
+  <div class="htop"><h1>Your trusted source for ready-to-construct steel-framed home plans.</h1>  </div>
 </header>
 
 
@@ -1251,7 +1250,7 @@ var penSpeed=0;
 function sound(){if(!snd.ok)return;var t=snd.ctx.currentTime,tg=snd.muted||!vis||document.hidden?0:Math.min(.1,penSpeed*.0004);snd.g.gain.setTargetAtTime(tg,t,.14);snd.src.playbackRate.setTargetAtTime(.9+Math.min(.3,penSpeed*.0008),t,.2)}
 /* ---------- layout ---------- */
 function layout(){DP=Math.min(2,devicePixelRatio||1);W=hero.clientWidth;H=hero.clientHeight;cv.width=W*DP;cv.height=H*DP;
-  var en=hero.querySelector('.htop > p'),hr=hero.getBoundingClientRect(),eb=en?en.getBoundingClientRect().bottom-hr.top:H*.4,top=Math.round(eb+26),bot=H-(W<700?92:74),x0=W<700?10:Math.max(24,W*.06);
+  var en=hero.querySelector('.htop > h1'),hr=hero.getBoundingClientRect(),eb=en?en.getBoundingClientRect().bottom-hr.top:H*.4,top=Math.round(eb+26),bot=H-(W<700?92:74),x0=W<700?10:Math.max(24,W*.06);
   PR={x:x0,y:top,w:W-x0*2,h:Math.max(170,bot-top)};pad.style.left=PR.x+'px';pad.style.top=PR.y+'px';pad.style.width=PR.w+'px';pad.style.height=PR.h+'px';
   hint.style.left=PR.x+'px';hint.style.top=PR.y+'px';hint.style.width=PR.w+'px';hint.style.height=PR.h+'px';
   paper=document.createElement('canvas');paper.width=W*DP;paper.height=H*DP;var p=paper.getContext('2d');p.setTransform(DP,0,0,DP,0,0);p.fillStyle='#fbfcfd';p.fillRect(0,0,W,H);
