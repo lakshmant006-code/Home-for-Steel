@@ -963,11 +963,7 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
   <div class="sk-cap" id="skCap"></div>
   <div class="sk-prog" id="skProg"><i></i></div>
   <div class="sk-bar" id="skBar"><button type="button" class="sk-go" id="hSkip">Sketch your own plan</button><button type="button" class="sk-go pri" id="hFinish">Finish drawing</button><button type="button" class="sk-go pri" id="hExtrude">Extrude to 3D</button><button type="button" class="sk-go" id="hBack">Back to plan</button><button type="button" class="sk-go" id="hClear">Clear</button></div>
-  <div class="htop"><h1>Your trusted source for ready-to-construct steel-framed home plans.</h1><p>From single family homes, sheds and ADUs to any custom design and personalised steel home plans.</p><div class="entry">
-    <a class="ent" href="#shop"><i><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7M5 10v10h14V10M10 20v-6h4v6"/></svg></i><b>Shop ready plans</b><span>Engineered, priced, download today</span></a>
-    <a class="ent" href="#modify"><i><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16zM14 7l3 3"/></svg></i><b>Change a plan</b><span>Pick one, mark what you want different</span></a>
-    <a class="ent" href="#bring"><i><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg></i><b>Bring your own</b><span>Upload a sketch or architect plan</span></a>
-  </div>
+  <div class="htop"><h1>Your trusted source for ready-to-construct steel-framed home plans.</h1><p>From single family homes, sheds and ADUs to any custom design and personalised steel home plans.</p>
   </div>
 </header>
 
@@ -1283,7 +1279,7 @@ var penSpeed=0;
 function sound(){if(!snd.ok)return;var t=snd.ctx.currentTime,tg=snd.muted||!vis||document.hidden?0:Math.min(.1,penSpeed*.0004);snd.g.gain.setTargetAtTime(tg,t,.14);snd.src.playbackRate.setTargetAtTime(.9+Math.min(.3,penSpeed*.0008),t,.2)}
 /* ---------- layout ---------- */
 function layout(){DP=Math.min(2,devicePixelRatio||1);W=hero.clientWidth;H=hero.clientHeight;cv.width=W*DP;cv.height=H*DP;
-  var en=hero.querySelector('.entry'),hr=hero.getBoundingClientRect(),eb=en?en.getBoundingClientRect().bottom-hr.top:H*.4,top=Math.round(eb+26),bot=H-(W<700?92:74),x0=W<700?10:Math.max(24,W*.06);
+  var en=hero.querySelector('.htop > p'),hr=hero.getBoundingClientRect(),eb=en?en.getBoundingClientRect().bottom-hr.top:H*.4,top=Math.round(eb+26),bot=H-(W<700?92:74),x0=W<700?10:Math.max(24,W*.06);
   PR={x:x0,y:top,w:W-x0*2,h:Math.max(170,bot-top)};pad.style.left=PR.x+'px';pad.style.top=PR.y+'px';pad.style.width=PR.w+'px';pad.style.height=PR.h+'px';
   hint.style.left=PR.x+'px';hint.style.top=PR.y+'px';hint.style.width=PR.w+'px';hint.style.height=PR.h+'px';
   paper=document.createElement('canvas');paper.width=W*DP;paper.height=H*DP;var p=paper.getContext('2d');p.setTransform(DP,0,0,DP,0,0);p.fillStyle='#fbfcfd';p.fillRect(0,0,W,H);
@@ -1440,7 +1436,17 @@ new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){start();i
 
 })();
 </script>
-
+<style>
+/* animation layer: GSAP takes over .reveal once it has loaded */
+.gx .reveal{transition:none}
+.gx-m{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.12em;margin-bottom:-.12em}
+.gx-w{display:inline-block;will-change:transform}
+.gx-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:9999;background:linear-gradient(90deg,#2E6A8E,#B3152B);transform:scaleX(0);transform-origin:0 50%;pointer-events:none}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script src="animations.js"></script>
 
 </body>
 </html>
