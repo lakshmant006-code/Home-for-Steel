@@ -1140,7 +1140,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     for(var i=0;i<n;i++){mx[i]=M[i*4]/10-gx;my[i]=M[i*4+1]/10-gy;mz[i]=M[i*4+2]/10-gz;mt[i]=M[i*4+3]}
     /* streaming dots land on the bottom fifth of the model (they leave from the top edge of the plan) */
     var by0=1e9,by1=-1e9;for(var i=0;i<n;i++){if(my[i]<by0)by0=my[i];if(my[i]>by1)by1=my[i]}var cut=by0+(by1-by0)*.22,BOT=[];for(var i=0;i<n;i++)if(my[i]<cut)BOT.push(i);if(!BOT.length)BOT.push(0);
-    ST=[];for(var i=0;i<16000;i++)ST.push({k:BOT[(Math.random()*BOT.length)|0],ph:Math.random(),sp:.16+Math.random()*.16,j:Math.random()});buildPlan();ready=true}
+    ST=[];for(var i=0;i<5500;i++)ST.push({k:BOT[(Math.random()*BOT.length)|0],ph:Math.random(),sp:.16+Math.random()*.16,j:Math.random()});buildPlan();ready=true}
   var GS=2,GW=0,GH=0,zb=null;
   function ez(u){return u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2}
   function proj(i,ca,sa,cp,sp,f,D,cx,cy,o){var x=mx[i]*ca-mz[i]*sa,z=mx[i]*sa+mz[i]*ca,y=my[i],y2=y*cp-z*sp,z2=-(z*cp+y*sp),k=f/(D+z2);o[0]=cx+x*k;o[1]=cy-y2*k;o[2]=z2}
