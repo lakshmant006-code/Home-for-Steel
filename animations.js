@@ -105,10 +105,10 @@
     });
   }
   $$('#clear .cl-card').forEach(function (c, i) {
-    gsap.set(c, { opacity: 0, x: i ? 80 : -80, rotate: i ? 2 : -2 });
+    gsap.set(c, { opacity: 0, y: 44 });                         // plain rise-in: cards never slide in from the side
     ScrollTrigger.create({
-      trigger: c, start: 'top 85%', once: true,
-      onEnter: function () { gsap.to(c, { opacity: 1, x: 0, rotate: 0, duration: 1.3, ease: EASE, onComplete: function () { settle(c); } }); }
+      trigger: c, start: 'top 88%', once: true,
+      onEnter: function () { gsap.to(c, { opacity: 1, y: 0, duration: 1.1, ease: EASE, delay: i * 0.1, onComplete: function () { settle(c); } }); }
     });
   });
   var fileRows = $$('#clear .files li');
@@ -138,13 +138,11 @@
       scrollTrigger: scrub(foot, 'top bottom', 'top 35%') });
     // the white dots and plan drift slower than the page and settle as you arrive
     gsap.fromTo('#p2mStage', { yPercent: -7, scale: 1.06 }, { yPercent: 4, scale: 1, ease: 'none', scrollTrigger: scrub(foot, 'top bottom', 'top 5%') });
-    gsap.from($$('#foot .p2m-key > div'), { y: 36, opacity: 0, duration: 0.9, ease: EASE, stagger: 0.12,
-      scrollTrigger: { trigger: '.p2m-key', start: 'top 95%', once: true } });
     // contact columns rise at three different speeds
     $$('#foot .hf-grid > p').forEach(function (col, i) {
       gsap.fromTo(col, { y: 70 + i * 55, opacity: 0.2 }, { y: 0, opacity: 1, ease: 'none', scrollTrigger: scrub('.hf-grid', 'top 105%', 'top 55%') });
     });
-    gsap.from('.hf-cta', { yPercent: 60, opacity: 0, duration: 1, ease: 'back.out(1.6)', scrollTrigger: { trigger: '.hf-cta', start: 'top 95%', once: true } });
+    gsap.from('.hf-cta', { clipPath: 'inset(100% 0 0 0)', duration: 1.1, ease: 'expo.out', clearProps: 'clipPath', scrollTrigger: { trigger: '.hf-cta', start: 'top 98%', once: true } });
     gsap.from('.hf-copy', { opacity: 0, y: 20, duration: 1, ease: EASE, scrollTrigger: { trigger: '.hf-copy', start: 'top 100%', once: true } });
     // the outlined wordmark slides sideways as the footer scrolls into view
     gsap.fromTo('.hf-mark span', { xPercent: 4 }, { xPercent: -34, ease: 'none', scrollTrigger: scrub(foot, 'top bottom', 'bottom bottom') });
@@ -210,9 +208,11 @@
       });
       el.addEventListener('mouseleave', function () { xTo(0); yTo(0); });
     });
+    /* lift only the content: the card's own border lines and corner crossbars must stay put */
     $$('.cl-card, .ft, .c3').forEach(function (el) {
-      el.addEventListener('mouseenter', function () { gsap.to(el, { y: -6, duration: 0.4, ease: 'power2.out', overwrite: 'auto' }); });
-      el.addEventListener('mouseleave', function () { gsap.to(el, { y: 0, duration: 0.5, ease: 'power2.out', overwrite: 'auto' }); });
+      var kids = $$(':scope > *', el);
+      el.addEventListener('mouseenter', function () { gsap.to(kids, { y: -6, duration: 0.4, ease: 'power2.out', overwrite: 'auto' }); });
+      el.addEventListener('mouseleave', function () { gsap.to(kids, { y: 0, duration: 0.5, ease: 'power2.out', overwrite: 'auto' }); });
     });
   }
 

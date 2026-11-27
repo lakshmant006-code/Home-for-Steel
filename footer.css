@@ -29,3 +29,44 @@ footer.hf .hf-copy{color:rgba(255,255,255,.6);opacity:1;margin-top:34px;padding-
 .hf-mark span{display:inline-block;font-size:clamp(70px,15vw,230px);font-weight:700;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.2);will-change:transform}
 @media(max-width:800px){footer.hf .hf-grid{grid-template-columns:1fr}footer.hf#foot{border-radius:32px 32px 0 0}}
 footer.hf a.hf-cta{background:#fff;color:#000;background-image:none}
+
+/* ---- footer, tighter: heading top-left over the empty corner of the canvas, huge white request bar, small gaps ---- */
+footer.hf#foot{padding-top:clamp(40px,5vw,72px)!important;margin-top:4vh}
+.hf-3d{margin:0 auto clamp(18px,2.5vw,30px)}
+footer.hf .p2m-stage{border-bottom:0}
+footer.hf a.hf-cta{position:static;left:auto;transform:none;display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;margin:12px 0 0;padding:clamp(28px,4.6vw,60px) clamp(22px,3vw,44px);border-radius:0;background:#fff;color:#000;font-size:clamp(28px,5vw,70px);font-weight:600;letter-spacing:-.04em;line-height:1}
+footer.hf a.hf-cta span{font-size:1.1em;flex:none}
+footer.hf a.hf-cta:hover{background:#ececec;box-shadow:none}
+footer.hf .hf-grid{margin-top:0;padding-top:26px;gap:20px 36px;font-size:17px;border-top:0}
+.hf-h{margin-bottom:10px}
+footer.hf .hf-copy{margin-top:18px}
+.hf-mark{margin-top:12px}
+@media(min-width:761px){
+  .hf-3d-head{position:absolute;left:0;top:0;z-index:2;text-align:left;max-width:min(430px,38%);margin:0}
+  .hf-3d-head h2{font-size:clamp(26px,3.2vw,44px);margin:14px 0 10px}
+  .hf-3d-head p{margin:0;max-width:none;font-size:15px}
+}
+@media(max-width:760px){                                  /* phones: stay centred and a little smaller */
+  .hf-3d-head{text-align:center;margin:0 auto 14px}
+  .hf-3d-head h2{font-size:clamp(26px,8vw,36px)}
+  footer.hf a.hf-cta{justify-content:center;text-align:center;padding:26px 18px;font-size:clamp(22px,7vw,32px)}
+  footer.hf .hf-grid{text-align:center;justify-items:center;gap:22px}
+  footer.hf .hf-copy{text-align:center}
+}
+
+/* ---- feature cards (Search / Price / Build): no titles, smaller, responsive ---- */
+.ft{padding:22px 20px 26px;gap:10px}
+.ft svg{width:32px;height:32px}
+.ft p{margin:0;max-width:30ch;font-size:15px}
+@media(max-width:760px){.ft{padding:16px 16px 20px;gap:8px}.ft svg{width:28px;height:28px}.ft p{font-size:14.5px}}
+@media(max-width:760px){
+  .sh-feats{grid-template-columns:1fr!important}
+  .ft{border-right:0!important;border-bottom:1px solid var(--rule)}.ft:last-child{border-bottom:0}
+}
+
+/* ---- request button: small white button under the heading text (replaces the huge bar) ---- */
+footer.hf a.hf-cta,
+footer.hf a.hf-cta:hover{display:inline-flex;align-items:center;justify-content:center;width:auto;gap:10px;margin:18px 0 0;padding:12px 22px;border-radius:999px;font-size:15.5px;font-weight:600;letter-spacing:0;line-height:1.2;text-align:center}
+footer.hf a.hf-cta span{font-size:1em}
+footer.hf a.hf-cta:hover{background:#e9e9e9}
+@media(max-width:760px){footer.hf a.hf-cta{margin-top:16px;padding:12px 22px;font-size:15.5px}}
