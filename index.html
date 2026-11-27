@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+/* hide what is about to animate until the animation script has set its start state (no flash of the finished page).
+   Always released: by animations.js, or on load / after 3s if the animation libraries never arrive. */
+(function(){var d=document.documentElement;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('gxp');
+function go(){d.classList.remove('gxp')}setTimeout(go,3000);addEventListener('load',function(){setTimeout(go,150)})})();
+</script>
+<style>.gxp nav,.gxp .hero h1,.gxp h2.lead,.gxp .hf-3d-head h2{visibility:hidden}</style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Home Plans for Steel Redesign</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1134,13 +1141,15 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
   function renderPlan(){PC=document.createElement('canvas');PC.width=W*DP;PC.height=H*DP;var c=PC.getContext('2d');c.setTransform(DP,0,0,DP,0,0);c.drawImage(pimg,bP.x,bP.y,bP.w,bP.h);c.globalCompositeOperation='source-in';c.fillStyle='#fff';c.fillRect(0,0,W,H)}
   function layout(){DP=Math.min(2,devicePixelRatio||1);W=st.clientWidth;H=st.clientHeight;cv.width=W*DP;cv.height=H*DP;var pad=20,ar=pimg.naturalWidth/pimg.naturalHeight;
     if(W<760){var ph=Math.min(H*.1,(W-pad*2)*.26/ar),pw=ph*ar;bP={x:(W-pw)/2,y:H-pad-ph-6,w:pw,h:ph};bH={x:pad,y:pad,w:W-pad*2,h:H-pad*2-ph-6}} /* phones: plan below, model above */
-    else{var ph3=Math.min(H*.1,(W-pad*2)*.26/ar),pw3=ph3*ar;bP={x:pad+W*.02,y:H-pad-ph3-6,w:pw3,h:ph3};bH={x:pad+W*.22,y:pad,w:W-pad*2,h:H-pad*2-ph3-6}} /* same sizes as before: plan bottom-left corner, model top-right, dots stream diagonally */
+    else{var ph3=Math.min(H*.1,(W-pad*2)*.26/ar),pw3=ph3*ar;bP={x:Math.max(6,pad*.3),y:H-pad-ph3-6,w:pw3,h:ph3};bH={x:pad+W*.26,y:pad,w:W-pad*2,h:H-pad*2-ph3-6}} /* same sizes as before: plan bottom-left corner, model top-right, dots stream diagonally */
     renderPlan()}
   function init(){var n=Math.min(M.length/4|0,84000);mx=new Float32Array(n);my=new Float32Array(n);mz=new Float32Array(n);mt=new Uint16Array(n);dpt=new Float32Array(n);NM=n;
     var x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,z0=1e9,z1=-1e9;for(var i=0;i<n;i++){var X=M[i*4]/10,Y=M[i*4+1]/10,Z=M[i*4+2]/10;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;if(Z<z0)z0=Z;if(Z>z1)z1=Z}
     var gx=(x0+x1)/2,gy=(y0+y1)/2,gz=(z0+z1)/2;/* pivot = true centre of the house, so it turns about its own vertical axis */
     for(var i=0;i<n;i++){mx[i]=M[i*4]/10-gx;my[i]=M[i*4+1]/10-gy;mz[i]=M[i*4+2]/10-gz;mt[i]=M[i*4+3]}
-    ST=[];for(var i=0;i<11000;i++)ST.push({k:(Math.random()*n)|0,ph:Math.random(),sp:.16+Math.random()*.16,j:Math.random()});buildPlan();ready=true}
+    /* streaming dots land on the bottom fifth of the model (they leave from the top edge of the plan) */
+    var by0=1e9,by1=-1e9;for(var i=0;i<n;i++){if(my[i]<by0)by0=my[i];if(my[i]>by1)by1=my[i]}var cut=by0+(by1-by0)*.22,BOT=[];for(var i=0;i<n;i++)if(my[i]<cut)BOT.push(i);if(!BOT.length)BOT.push(0);
+    ST=[];for(var i=0;i<11000;i++)ST.push({k:BOT[(Math.random()*BOT.length)|0],ph:Math.random(),sp:.16+Math.random()*.16,j:Math.random()});buildPlan();ready=true}
   var GS=2,GW=0,GH=0,zb=null;
   function ez(u){return u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2}
   function proj(i,ca,sa,cp,sp,f,D,cx,cy,o){var x=mx[i]*ca-mz[i]*sa,z=mx[i]*sa+mz[i]*ca,y=my[i],y2=y*cp-z*sp,z2=-(z*cp+y*sp),k=f/(D+z2);o[0]=cx+x*k;o[1]=cy-y2*k;o[2]=z2}
@@ -1157,7 +1166,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
       if(q<1){var pp=PL[i%PL.length],a=pmap(pp[0],pp[1]);x=a[0]+(x-a[0])*e;y=a[1]+(y-a[1])*e-Math.sin(Math.PI*e)*H*.08}
       var dep=1-Math.max(0,Math.min(1,(dpt[i]+60)/120));var tn=mt[i]&255;ctx.globalAlpha=q<1?Math.min(1,e*3):(gh?.3+.3*dep:.6+.4*dep);ctx.fillStyle='#fff';ctx.fillRect(x,y,.78,.78)}
     // continuous stream: dots leave the plan all the time and land on the model
-    for(var s=0;s<ST.length;s++){var p=ST[s],u=(t*p.sp+p.ph)%1;var k=p.k;proj(k,ca,sa,cp,sp,f,D,cx,cy,out);var a=pmap(PL[s%PL.length][0],PL[s%PL.length][1]),e=ez(Math.min(1,u*1.25)),x=a[0]+(out[0]-a[0])*e,y=a[1]+(out[1]-a[1])*e-Math.sin(Math.PI*e)*H*.1*(.4+p.j);
+    for(var s=0;s<ST.length;s++){var p=ST[s],u=(t*p.sp+p.ph)%1;var k=p.k;proj(k,ca,sa,cp,sp,f,D,cx,cy,out);var pq=PL[s%PL.length],a=pmap(pq[0],W<760?pq[1]:pq[1]*.2),e=ez(Math.min(1,u*1.25)),x=a[0]+(out[0]-a[0])*e,y=a[1]+(out[1]-a[1])*e-Math.sin(Math.PI*e)*H*(W<760?.1:.03)*(.4+p.j);
       ctx.globalAlpha=u<.08?u/.08:u>.85?(1-u)/.15:1;ctx.fillStyle='#fff';ctx.fillRect(x,y,.75,.75)}
     ctx.globalAlpha=1}
   function start(){if(!vis||raf||!ready)return;if(!t0)t0=performance.now()-3200;raf=requestAnimationFrame(draw)}

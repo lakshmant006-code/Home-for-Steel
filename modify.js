@@ -75,12 +75,13 @@
     $('#m2Title').textContent = f === STD ? 'Your plan: ' + f.name : 'Your own plan: ' + f.name;
     $('#m2Meta').textContent = f.meta || 'Free selection: drag over any part of your drawing';
     $('#m2Reset').hidden = f === STD;
+    fx(function () { G.set('#m2Fig', { clipPath: 'inset(0 100% 0 0)' }); G.set('#m2Title', { opacity: 0, y: 10 }); });   // start hidden: no flash of the finished plan
     img.onload = function () {
       svg.setAttribute('viewBox', '0 0 ' + fig.W + ' ' + fig.H);
       svg.innerHTML = rooms.map(function (r, i) { var b = R(r); return '<rect class="rm" data-i="' + i + '" x="' + b.x0 + '" y="' + b.y0 + '" width="' + (b.x1 - b.x0) + '" height="' + (b.y1 - b.y0) + '"/>'; }).join('') + '<g id="m2Adds"></g><g id="m2Marks"></g>';
       fx(function () {
         G.fromTo('#m2Fig', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: 'power3.inOut', clearProps: 'clipPath' });
-        G.from('#m2Title', { y: 10, opacity: 0, duration: 0.6 });
+        G.to('#m2Title', { y: 0, opacity: 1, duration: 0.6, clearProps: 'all' });
       });
       syncBox();
     };

@@ -155,21 +155,39 @@
   function playPage(page) {
     var sec = $('section', page);
     if (!sec) return;
-    var tl = gsap.timeline({ defaults: { ease: EASE } });
-    tl.from($('.sh-bar', sec), { clipPath: 'inset(0 100% 0 0)', opacity: 0, duration: 1, ease: 'power4.inOut' })
-      .add(function () { headingIn($('h2.lead', sec)); }, '-=0.6')
-      .from($('.sub', sec), { y: 20, opacity: 0, duration: 0.8 }, '-=0.5');
-    var blocks = $$('.finder, .m2-pick, .m2-win, .bring-grid > .drop', sec);
-    if (blocks.length) { blocks.forEach(function (b) { b.classList.add('in'); }); tl.from(blocks, { y: 50, opacity: 0, duration: 1, stagger: 0.12 }, '-=0.5'); }
-    var cards = $$('.c3', sec);
-    if (cards.length) tl.from(cards, { y: 60, opacity: 0, rotateY: -12, transformPerspective: 800, duration: 1, stagger: 0.14 }, '-=0.6');
+    /* Every start state is set right now, in the same task that un-hid the page, so the final
+       layout is never painted before it animates (no flash of the finished heading). */
+    var bar = $('.sh-bar', sec), h = $('h2.lead', sec), sub = $('.sub', sec);
+    var blocks = $$('.finder, .m2-pick, .m2-win, .bring-grid > .drop', sec), cards = $$('.c3', sec);
+    var words = h ? splitWords(h) : [];
+    if (h) h.classList.add('in');
+    blocks.forEach(function (b) { b.classList.add('in'); });
     $$('.reveal', sec).forEach(function (el) { el.classList.add('in'); });
+    var all = [bar, h, sub].concat(blocks, cards, words).filter(Boolean);
+    gsap.killTweensOf(all);
+    if (h) gsap.set(h, { opacity: 1, y: 0, visibility: 'visible' });
+    if (words.length) gsap.set(words, { yPercent: 115, rotate: 4 });
+    if (bar) gsap.set(bar, { clipPath: 'inset(0 100% 0 0)', opacity: 0 });
+    if (sub) gsap.set(sub, { y: 20, opacity: 0 });
+    if (blocks.length) gsap.set(blocks, { y: 50, opacity: 0 });
+    if (cards.length) gsap.set(cards, { y: 60, opacity: 0, rotateY: -12, transformPerspective: 800 });
+    var tl = gsap.timeline({ defaults: { ease: EASE } });
+    if (bar) tl.to(bar, { clipPath: 'inset(0 0% 0 0)', opacity: 1, duration: 1, ease: 'power4.inOut', clearProps: 'clipPath,opacity' });
+    if (words.length) tl.to(words, { yPercent: 0, rotate: 0, duration: 1.1, stagger: 0.07 }, '-=0.6');
+    if (sub) tl.to(sub, { y: 0, opacity: 1, duration: 0.8, clearProps: 'all' }, '-=0.5');
+    if (blocks.length) tl.to(blocks, { y: 0, opacity: 1, duration: 1, stagger: 0.12, clearProps: 'transform,opacity' }, '-=0.5');
+    if (cards.length) tl.to(cards, { y: 0, opacity: 1, rotateY: 0, duration: 1, stagger: 0.14, clearProps: 'transform,opacity' }, '-=0.6');
   }
   $$('.vpage, #shopPage').forEach(function (page) {
+    /* a mutation observer callback runs as a microtask, before the browser paints the un-hidden page */
     new MutationObserver(function () {
-      if (!page.hidden) { requestAnimationFrame(function () { playPage(page); ScrollTrigger.refresh(); }); }
+      if (!page.hidden) { playPage(page); ScrollTrigger.refresh(); }
     }).observe(page, { attributes: true, attributeFilter: ['hidden'] });
+    if (!page.hidden) playPage(page);                          // deep link such as /#modify
   });
+
+  /* everything that animates now has its start state, so the pre-hide used before this script ran can go */
+  document.documentElement.classList.remove('gxp');
 
   /* shop plan cards are built by script: stagger them in as they appear */
   var grid = $('#pgrid');
