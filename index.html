@@ -1140,8 +1140,11 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     for(var i=0;i<n;i++){mx[i]=M[i*4]/10-gx;my[i]=M[i*4+1]/10-gy;mz[i]=M[i*4+2]/10-gz;mt[i]=M[i*4+3]}
     /* streaming dots land on the bottom fifth of the model (they leave from the top edge of the plan) */
     var by0=1e9,by1=-1e9;for(var i=0;i<n;i++){if(my[i]<by0)by0=my[i];if(my[i]>by1)by1=my[i]}var cut=by0+(by1-by0)*.22,BOT=[];for(var i=0;i<n;i++)if(my[i]<cut)BOT.push(i);if(!BOT.length)BOT.push(0);
-    ST=[];for(var i=0;i<16000;i++)ST.push({k:BOT[(Math.random()*BOT.length)|0],ph:Math.random(),sp:.16+Math.random()*.16,j:Math.random()});buildPlan();ready=true}
+    BOT.sort(function(a,b){return Math.atan2(mz[a],mx[a])-Math.atan2(mz[b],mx[b])});SL=[];for(var i=0;i<SN;i++)SL.push(BOT[Math.floor((i+.5)/SN*BOT.length)]); /* landing points spread around the base of the model */
+    ST=[];var gs=function(){return Math.random()+Math.random()+Math.random()-1.5};for(var i=0;i<15400;i++)ST.push({sid:i%SN,ph:Math.random(),sp:.13+Math.random()*.07,j:Math.random(),o:gs(),au:Math.random()-.5,av:Math.random()-.5});buildPlan();ready=true}
   var GS=2,GW=0,GH=0,zb=null;
+  /* seven distinct streams: where each starts on the plan (u,v), how it bends, and (set in init) where it lands on the model */
+  var SN=7,SL=[],SA=[[.05,.92],[.18,.12],[.32,.8],[.48,.2],[.62,.9],[.78,.15],[.93,.7]],SC=[.12,-.08,.1,-.12,.08,-.1,.1];
   function ez(u){return u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2}
   function proj(i,ca,sa,cp,sp,f,D,cx,cy,o){var x=mx[i]*ca-mz[i]*sa,z=mx[i]*sa+mz[i]*ca,y=my[i],y2=y*cp-z*sp,z2=-(z*cp+y*sp),k=f/(D+z2);o[0]=cx+x*k;o[1]=cy-y2*k;o[2]=z2}
   var out=[0,0,0];
@@ -1156,11 +1159,15 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
       var dl=(mx[i]*7.3+mz[i]*3.1)%1;dl=dl<0?dl+1:dl;var q=Math.min(1,Math.max(0,build*1.5-dl*.5));if(q<=0)continue;var e=ez(q),x=xs[i],y=ys[i];
       if(q<1){var pp=PL[i%PL.length],a=pmap(pp[0],pp[1]);x=a[0]+(x-a[0])*e;y=a[1]+(y-a[1])*e-Math.sin(Math.PI*e)*H*.08}
       var dep=1-Math.max(0,Math.min(1,(dpt[i]+60)/120));var tn=mt[i]&255;ctx.globalAlpha=q<1?Math.min(1,e*3):(gh?.3+.3*dep:.6+.4*dep);ctx.fillStyle='#fff';ctx.fillRect(x,y,.78,.78)}
-    // continuous stream: dots leave the plan all the time and land on the model
-    for(var s=0;s<ST.length;s++){var p=ST[s],u=(t*p.sp+p.ph)%1;var k=p.k;proj(k,ca,sa,cp,sp,f,D,cx,cy,out);var pq=PL[s%PL.length],a=pmap(pq[0],pq[1]),e=ez(Math.min(1,u*1.25)),
-      rise=Math.sin(Math.min(1,u*4)*Math.PI/2)*(1-e)*H*.07*(.3+p.j), /* each dot first lifts straight off its own spot on the plan, from every wall and room */
-      x=a[0]+(out[0]-a[0])*e+(p.j-.5)*12*Math.sin(Math.PI*e),y=a[1]+(out[1]-a[1])*e-rise-Math.sin(Math.PI*e)*H*(W<760?.1:.03)*(.4+p.j);
-      ctx.globalAlpha=u<.08?u/.08:u>.85?(1-u)/.15:1;ctx.fillStyle='#fff';var sz=.7+p.j*.7;ctx.fillRect(x,y,sz,sz)}
+    // seven distinct streams of dots, each on its own curved path from the plan to the base of the model
+    var SP=[];for(var qq=0;qq<SN;qq++){var a0=pmap(SA[qq][0],SA[qq][1]);proj(SL[qq],ca,sa,cp,sp,f,D,cx,cy,out);var ex=out[0],ey=out[1],ddx=ex-a0[0],ddy=ey-a0[1];
+      SP.push([a0[0],a0[1],(a0[0]+ex)/2-ddy*SC[qq],(a0[1]+ey)/2+ddx*SC[qq]-H*.045,ex,ey])}
+    for(var s=0;s<ST.length;s++){var p=ST[s],P=SP[p.sid],u=(t*p.sp+p.ph)%1,e=ez(Math.min(1,u*1.12)),m=1-e,
+      x=m*m*P[0]+2*m*e*P[2]+e*e*P[4],y=m*m*P[1]+2*m*e*P[3]+e*e*P[5],
+      tx=2*m*(P[2]-P[0])+2*e*(P[4]-P[2]),ty=2*m*(P[3]-P[1])+2*e*(P[5]-P[3]),tl=Math.hypot(tx,ty)||1,
+      wd=(6+6*Math.sin(Math.PI*e))*p.o*Math.min(1,W/900);                                   /* a ribbon: never pinched to a point where it lands */
+      x+=-ty/tl*wd+p.au*bP.w*.07*m*m;y+=tx/tl*wd+p.av*bP.h*.4*m*m;       /* each stream leaves from a small patch of the plan */
+      ctx.globalAlpha=(u<.12?u/.12:u>.72?(1-u)/.28:1)*.85;ctx.fillStyle='#fff';var sz=.7+p.j*.7;ctx.fillRect(x,y,sz,sz)}
     ctx.globalAlpha=1}
   function start(){if(!vis||raf||!ready)return;if(!t0)t0=performance.now()-3200;raf=requestAnimationFrame(draw)}
   function done(){if(!pimg.complete||!M||ready)return;init();layout();if(RMm){vis=true;t0=performance.now()-6000;draw(performance.now());vis=false}else start()}
