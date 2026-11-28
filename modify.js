@@ -148,12 +148,18 @@
     $$('.rm, .rl', svg).forEach(function (e) { e.parentNode.removeChild(e); });
     var before = $('#m2Dets', svg), frag = document.createDocumentFragment();
     rooms.forEach(function (r, i) {
-      var b = R(r), rect = document.createElementNS(NS, 'rect');
-      rect.setAttribute('class', 'rm'); rect.setAttribute('data-i', i); rect.setAttribute('x', b.x0); rect.setAttribute('y', b.y0); rect.setAttribute('width', b.x1 - b.x0); rect.setAttribute('height', b.y1 - b.y0);
+      var b = R(r), rect, ax = b.x0, ay = b.y0;
+      if (r.rects && r.rects.length) {
+        rect = document.createElementNS(NS, 'path'); rect.setAttribute('class', 'rm shape'); rect.setAttribute('data-i', i);
+        rect.setAttribute('d', r.rects.map(function (q) { return 'M' + q[0] + ' ' + q[1] + 'H' + q[2] + 'V' + q[3] + 'H' + q[0] + 'Z'; }).join(''));
+        var big = r.rects.reduce(function (m, q) { return (q[2] - q[0]) * (q[3] - q[1]) > (m[2] - m[0]) * (m[3] - m[1]) ? q : m; }, r.rects[0]); ax = big[0]; ay = big[1];   // the badge sits in the room's largest part
+      } else {
+        rect = document.createElementNS(NS, 'rect'); rect.setAttribute('class', 'rm'); rect.setAttribute('data-i', i); rect.setAttribute('x', b.x0); rect.setAttribute('y', b.y0); rect.setAttribute('width', b.x1 - b.x0); rect.setAttribute('height', b.y1 - b.y0);
+      }
       frag.appendChild(rect);
       if (r.auto) {                                                         // a numbered badge so each chip on the right matches a room on the plan
         var g = document.createElementNS(NS, 'g'), rad = Math.max(12, Math.min(22, fig.W / 60));
-        g.setAttribute('class', 'rl'); g.innerHTML = '<circle cx="' + (b.x0 + rad + 4) + '" cy="' + (b.y0 + rad + 4) + '" r="' + rad + '"/><text x="' + (b.x0 + rad + 4) + '" y="' + (b.y0 + rad + 4 + rad * .36) + '" text-anchor="middle" style="font-size:' + (rad * 1.05) + 'px">' + (i + 1) + '</text>';
+        g.setAttribute('class', 'rl'); g.innerHTML = '<circle cx="' + (ax + rad + 4) + '" cy="' + (ay + rad + 4) + '" r="' + rad + '"/><text x="' + (ax + rad + 4) + '" y="' + (ay + rad + 4 + rad * .36) + '" text-anchor="middle" style="font-size:' + (rad * 1.05) + 'px">' + (i + 1) + '</text>';
         frag.appendChild(g);
       }
     });
@@ -180,6 +186,12 @@
       readRooms(imgEl, mine, null, true);                                  // model could not run: fall back to the line-based reader
     });
   }
+  function scaleFromDoors(all) {                                            // a standard door is about 3 ft wide: its swing gives the plan's scale (about 3% off on the Ranch, where the true scale is known)
+    var ds = all.filter(function (d) { return d.cls === 'Door' && d.conf >= .5; }).map(function (d) { return Math.max(d.box[2] - d.box[0], d.box[3] - d.box[1]); }).sort(function (a, b) { return a - b; });
+    if (ds.length < 3) return 0;
+    var pxFt = ds[ds.length >> 1] / 3, widthFt = fig.W / pxFt;
+    return widthFt >= 15 && widthFt <= 400 ? pxFt : 0;                      // anything outside a believable building width is not trusted
+  }
   function readRooms(imgEl, mine, modelDets, fellBack) {
     if (fig !== mine) return;                                               // the visitor switched plans while it was reading
     var res = null;
@@ -189,7 +201,16 @@
       note.textContent = 'We could not find clear rooms on this drawing, so drag over any part of it and describe the change.';
       return;
     }
-    mine.rooms = rooms = res.rooms.map(function (r, i) { return { n: 'Room ' + (i + 1), b: r.b, d: null, auto: true }; });
+    var ft = modelDets ? scaleFromDoors(modelDets) : 0, stairs = modelDets ? modelDets.filter(function (d) { return d.cls === 'Stair Case'; }) : [], k = 0, ns = 0;
+    mine.pxFtX = mine.pxFtY = ft || undefined;
+    mine.rooms = rooms = res.rooms.map(function (r) {
+      var room = { n: '', b: r.b, rects: r.rects, d: ft ? [(r.b[2] - r.b[0]) / ft, (r.b[3] - r.b[1]) / ft] : null, ft: ft || 0, est: !!ft, auto: true };
+      var isStairs = stairs.some(function (sd) {                            // only when the stair is most of the room: a living room that merely has a staircase in it stays a room
+        return rin(room, (sd.box[0] + sd.box[2]) / 2, (sd.box[1] + sd.box[3]) / 2) && (sd.box[2] - sd.box[0]) * (sd.box[3] - sd.box[1]) >= rarea(room) * .35;
+      });
+      room.n = isStairs ? (ns++ ? 'Stairs (' + ns + ')' : 'Stairs') : 'Room ' + (++k);
+      return room;
+    });
     drawRoomMarks(); renderRooms(); clearSel();
     fx(function () { G.from('#m2Svg .rm, #m2Svg .rl', { opacity: 0, duration: .6, stagger: .03, ease: 'power2.out' }); });
     note.textContent = modelDets
@@ -198,12 +219,12 @@
   }
   function renderRooms() {
     $('#m2RL').hidden = !rooms.length;
-    $('#m2Rooms').innerHTML = rooms.map(function (r, i) { return '<button type="button" data-i="' + i + '">' + esc(r.n) + '</button>'; }).join('');
+    $('#m2Rooms').innerHTML = rooms.map(function (r, i) { var z = r.auto ? sizeTxt(r) : ''; return '<button type="button" data-i="' + i + '">' + esc(r.n) + (z ? '<small>' + z + '</small>' : '') + '</button>'; }).join('');
     fx(function () { G.from('#m2Rooms button', { y: 10, opacity: 0, duration: 0.45, stagger: 0.025, ease: 'power3.out', delay: 0.5 }); });
   }
   $('#m2Rooms').addEventListener('mouseover', function (e) { var b = e.target.closest('button'); $$('.rm', svg).forEach(function (g) { g.classList.toggle('peek', !!b && g.dataset.i === b.dataset.i); }); });
   $('#m2Rooms').addEventListener('mouseleave', function () { $$('.rm', svg).forEach(function (g) { g.classList.remove('peek'); }); });
-  $('#m2Rooms').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { var r = R(rooms[+b.dataset.i]); select(r.x0, r.y0, r.x1, r.y1); } });
+  $('#m2Rooms').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { var rr = rooms[+b.dataset.i], r = R(rr); select(r.x0, r.y0, r.x1, r.y1, rr); } });
   $('#m2File').addEventListener('change', function () {
     var f = this.files[0]; if (!f) return;
     if (objUrl) URL.revokeObjectURL(objUrl);
@@ -239,38 +260,57 @@
   stage.addEventListener('pointerup', function (e) {
     if (!drag) return; var d = drag; drag = null;
     var a = toPlan(Math.min(e.clientX, d.cx), Math.min(e.clientY, d.cy)), z = toPlan(Math.max(e.clientX, d.cx), Math.max(e.clientY, d.cy));
-    if (!d.moved) { var hit = roomAt(a.x, a.y); if (hit) { var r = R(hit); select(r.x0, r.y0, r.x1, r.y1); } else clearSel(); return; }
+    if (!d.moved) { var hit = roomAt(a.x, a.y); if (hit) { var r = R(hit); select(r.x0, r.y0, r.x1, r.y1, hit); } else clearSel(); return; }
     select(a.x, a.y, z.x, z.y);
   });
   stage.addEventListener('pointercancel', function () { drag = null; });
 
+  function rarea(r) {                                                       // area of a room's real outline (or its box when it has none)
+    if (r._a) return r._a;
+    var a = 0; if (r.rects) r.rects.forEach(function (q) { a += (q[2] - q[0]) * (q[3] - q[1]); }); else { var b = R(r); a = (b.x1 - b.x0) * (b.y1 - b.y0); }
+    return (r._a = a);
+  }
+  function rin(r, x, y) {
+    if (!r.rects) { var b = R(r); return x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1; }
+    return r.rects.some(function (q) { return x >= q[0] && x <= q[2] && y >= q[1] && y <= q[3]; });
+  }
+  function rover(r, x0, y0, x1, y1) {                                       // how much of the room's outline lies inside a dragged box
+    if (!r.rects) return overlap(R(r), x0, y0, x1, y1);
+    var s = 0; r.rects.forEach(function (q) { var w = Math.min(q[2], x1) - Math.max(q[0], x0), h = Math.min(q[3], y1) - Math.max(q[1], y0); if (w > 0 && h > 0) s += w * h; });
+    return s;
+  }
+  function sizeTxt(r) {                                                     // estimated size from the plan's door-size scale
+    if (!r.d || !r.ft) return '';
+    var b = R(r), fill = rarea(r) / Math.max(1, (b.x1 - b.x0) * (b.y1 - b.y0));
+    return fill < .85 ? '≈ ' + Math.round(rarea(r) / (r.ft * r.ft)) + ' sq ft' : '≈ ' + Math.round(r.d[0]) + ' × ' + Math.round(r.d[1]) + ' ft';
+  }
   function roomAt(x, y) {
     var best = null, ba = 1e12;                                   // smallest room under the point wins (closets inside rooms)
-    rooms.forEach(function (r) { var b = R(r), a = (b.x1 - b.x0) * (b.y1 - b.y0); if (x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1 && a < ba) { best = r; ba = a; } });
+    rooms.forEach(function (r) { var a = rarea(r); if (rin(r, x, y) && a < ba) { best = r; ba = a; } });
     return best;
   }
   function overlap(b, x0, y0, x1, y1) { var w = Math.min(b.x1, x1) - Math.max(b.x0, x0), h = Math.min(b.y1, y1) - Math.max(b.y0, y0); return w > 0 && h > 0 ? w * h : 0; }
   function hits(x0, y0, x1, y1) {
-    return rooms.filter(function (r) { var b = R(r), a = (b.x1 - b.x0) * (b.y1 - b.y0); return overlap(b, x0, y0, x1, y1) / a >= 0.3; });
+    return rooms.filter(function (r) { return rover(r, x0, y0, x1, y1) / rarea(r) >= 0.3; });
   }
   function hilite(x0, y0, x1, y1) {
     var on = hits(x0, y0, x1, y1);
     $$('.rm', svg).forEach(function (g) { g.classList.toggle('hit', on.indexOf(rooms[+g.dataset.i]) > -1); });
   }
 
-  function select(x0, y0, x1, y1) {
+  function select(x0, y0, x1, y1, only) {
     x0 = Math.max(0, x0); y0 = Math.max(0, y0); x1 = Math.min(fig.W, x1); y1 = Math.min(fig.H, y1);
     if (x1 - x0 < 14 || y1 - y0 < 14) { clearSel(); return; }
-    var hs = hits(x0, y0, x1, y1), label, dim;
+    var hs = only ? [only] : hits(x0, y0, x1, y1), label, dim;
     label = hs.length === 1 ? hs[0].n : hs.length > 1 ? hs.length + ' rooms' : (fig === STD ? 'Open area' : 'Selected area');
-    if (hs.length === 1 && hs[0].d) dim = fmt(hs[0].d[0]) + ' × ' + fmt(hs[0].d[1]);
+    if (hs.length === 1 && hs[0].d) dim = hs[0].est ? sizeTxt(hs[0]) : fmt(hs[0].d[0]) + ' × ' + fmt(hs[0].d[1]);
     else if (hs.length === 1) dim = '';
-    else if (fig === STD && hs.length !== 1) dim = '≈ ' + Math.round((x1 - x0) / fig.pxFtX) + "' × " + Math.round((y1 - y0) / fig.pxFtY) + "'";
+    else if (fig.pxFtX && hs.length !== 1) dim = '≈ ' + Math.round((x1 - x0) / fig.pxFtX) + "' × " + Math.round((y1 - y0) / fig.pxFtY) + "'";
     else dim = '';
     sel = { x0: x0, y0: y0, x1: x1, y1: y1, rooms: hs, label: label, dim: dim, els: elsIn(x0, y0, x1, y1) };
     var found = summ(sel.els);
     $$('.det', svg).forEach(function (r) { r.classList.toggle('on', sel.els.indexOf(dets[+r.dataset.i]) > -1); });
-    hilite(x0, y0, x1, y1); syncBox(); box.hidden = false; box.classList.remove('done'); void box.offsetWidth; box.classList.add('done');
+    $$('.rm', svg).forEach(function (g) { g.classList.toggle('hit', hs.indexOf(rooms[+g.dataset.i]) > -1); }); syncBox(); box.hidden = false; box.classList.remove('done'); void box.offsetWidth; box.classList.add('done');
     var names = hs.length > 1 ? hs.map(function (r) { return r.n; }).join(', ') : '';
     $('#m2SelTx').textContent = 'Selected · ' + label + (dim ? ' · ' + dim : '') + (found ? ' · ' + found : '');
     selBar.classList.add('on');
@@ -333,14 +373,14 @@
     var t = c.t.toLowerCase(), s = c.sel, add = $('#m2Adds', svg), cx = (s.x0 + s.x1) / 2, cy = (s.y0 + s.y1) / 2, w = s.x1 - s.x0, h = s.y1 - s.y0, info = '';
     function mk(html) { var n = document.createElementNS(NS, 'g'); n.setAttribute('class', 'mn'); n.innerHTML = html; add.appendChild(n); fx(function () { G.from(n, { opacity: 0, duration: 0.7 }); }); glow(n); return n; }
     if (/bigger|larger|expand|wider|enlarge|more space/.test(t)) {
-      var f = 1.12, targets = s.rooms.length ? s.rooms.map(function (r) { return { b: R(r), n: r.n, d: r.d }; }) : [{ b: s, n: s.label, d: null }];
+      var f = 1.12, targets = s.rooms.length ? s.rooms.map(function (r) { return { b: R(r), n: r.n, d: r.d, est: r.est }; }) : [{ b: s, n: s.label, d: null }];
       targets.forEach(function (o) {
         var b = o.b, bw = b.x1 - b.x0, bh = b.y1 - b.y0, nx = b.x0 - bw * (f - 1) / 2, ny = b.y0 - bh * (f - 1) / 2, nw = bw * f, nh = bh * f;
         var r = document.createElementNS(NS, 'rect'); r.setAttribute('class', 'grow'); r.setAttribute('x', nx); r.setAttribute('y', ny); r.setAttribute('width', nw); r.setAttribute('height', nh); r.setAttribute('rx', 6);
         add.appendChild(r);
         fx(function () { G.from(r, { attr: { x: b.x0, y: b.y0, width: bw, height: bh }, duration: 1.2, ease: 'elastic.out(1,.6)' }); });
         glow(r);
-        if (o.d) info += o.n + ' ' + fmt(o.d[0]) + ' × ' + fmt(o.d[1]) + ' → ' + fmt(o.d[0] * f) + ' × ' + fmt(o.d[1] * f) + '. ';
+        if (o.d) info += o.est ? o.n + ' about ' + Math.round(o.d[0]) + ' × ' + Math.round(o.d[1]) + ' ft → ' + Math.round(o.d[0] * f) + ' × ' + Math.round(o.d[1] * f) + ' ft. ' : o.n + ' ' + fmt(o.d[0]) + ' × ' + fmt(o.d[1]) + ' → ' + fmt(o.d[0] * f) + ' × ' + fmt(o.d[1] * f) + '. ';
       });
     } else if (/(remove|delete|close|fill).*window|window.*(remove|delete)/.test(t)) {
       var ws = (s.els || []).filter(function (d) { return d.cls === 'Window'; });
