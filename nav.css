@@ -1,0 +1,92 @@
+/* ==========================================================================
+   Navigation: logo left, six links centre, request button right.
+   A pill follows the pointer and rests on the current page. See DESIGN.md, "Top bar".
+   Loaded after design.css.
+   ========================================================================== */
+
+html nav#siteNav{
+  position:fixed;top:0;left:0;right:0;transform:none;z-index:50;width:100%;height:64px;
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:clamp(16px,3vw,40px);
+  padding:0 var(--g,clamp(20px,4vw,56px));border-radius:0;
+  background:rgba(255,255,255,.78)!important;-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);
+  border:0!important;border-bottom:1px solid transparent!important;box-shadow:none!important;
+  transition:background .3s ease,border-color .3s ease,box-shadow .3s ease}
+html nav#siteNav.scrolled{background:rgba(255,255,255,.94)!important;border-bottom-color:var(--rule)!important;box-shadow:0 10px 30px -22px rgba(11,34,51,.45)!important}
+
+html nav#siteNav .nlogo{justify-self:start;display:flex;align-items:center;padding:6px 4px;order:0}
+html nav#siteNav .nlogo img{height:30px;width:auto;transition:transform .5s var(--ease-out)}
+html nav#siteNav .nlogo:hover img{transform:scale(1.06)}
+
+/* links with a sliding pill */
+html nav#siteNav .nl{position:relative;display:flex!important;align-items:center;justify-content:center;justify-self:center;gap:2px;order:1;min-width:0}
+html nav#siteNav .nl>a,html nav#siteNav .nl>.nacct{
+  position:relative;z-index:1;display:inline-flex;align-items:center;height:38px;padding:0 15px;margin:0;border:0;border-radius:999px;background:none;
+  font:500 .9375rem/1 var(--font-text,Inter,sans-serif)!important;letter-spacing:0!important;text-transform:none!important;color:var(--ink-2,#46515C);white-space:nowrap;cursor:pointer;
+  transition:color .25s ease}
+html nav#siteNav .nl>a:after,html nav#siteNav .nl>.nacct:after{display:none!important}
+html nav#siteNav .nl>a:hover,html nav#siteNav .nl>.nacct:hover,html nav#siteNav .nl>a.is-on,html nav#siteNav .nl>.nacct.is-on{color:var(--ink,#0B2233)}
+html nav#siteNav .nind{position:absolute;z-index:0;top:50%;left:0;height:38px;width:0;margin-top:-19px;border-radius:999px;background:rgba(11,34,51,.07);opacity:0;transform:translateX(0);
+  transition:transform .45s var(--ease-out,cubic-bezier(.16,1,.3,1)),width .45s var(--ease-out,cubic-bezier(.16,1,.3,1)),opacity .25s ease,background .25s ease;pointer-events:none}
+html nav#siteNav .nind.on{opacity:1}
+html nav#siteNav .nind.rest{background:rgba(11,34,51,.1)}
+
+/* request button: the one primary action, always sticky */
+html nav#siteNav .nr{display:flex!important;justify-self:end;align-items:center;order:2}
+html nav#siteNav .nr .nlk{display:none!important}
+html nav#siteNav .npill{display:inline-flex;align-items:center;height:40px;padding:0 18px;margin:0;border-radius:999px!important;background:var(--ink,#0B2233)!important;color:#fff!important;border:0!important;font:500 .9375rem/1 var(--font-text,Inter,sans-serif)!important;letter-spacing:0;white-space:nowrap;box-shadow:none;transition:background .25s ease,box-shadow .3s ease}
+html nav#siteNav .npill:hover{background:#15405c!important;box-shadow:0 10px 22px -12px rgba(11,34,51,.7)}
+
+/* hamburger and panel (below 1100px the six links no longer fit) */
+html nav#siteNav .nmenu,html nav#siteNav .npanel{display:none}
+@media(max-width:1100px){
+  html nav#siteNav{grid-template-columns:auto 1fr auto auto;column-gap:10px}
+  html nav#siteNav .nl{display:none!important}
+  html nav#siteNav .nr{grid-column:3}
+  html nav#siteNav .nmenu{display:grid;grid-column:4;place-items:center;width:44px;height:44px;border:0;border-radius:999px;background:transparent;color:var(--ink,#0B2233);cursor:pointer;transition:background .25s ease}
+  html nav#siteNav .nmenu:hover,html nav#siteNav .nmenu:active{background:rgba(11,34,51,.07)}
+  html nav#siteNav .npanel{position:absolute;top:100%;left:0;right:0;display:grid;padding:8px var(--g,24px) 18px;background:rgba(255,255,255,.97);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--rule);box-shadow:0 24px 40px -28px rgba(11,34,51,.5);
+    clip-path:inset(0 0 100% 0);opacity:0;visibility:hidden;transition:clip-path .5s var(--ease-out,cubic-bezier(.16,1,.3,1)),opacity .25s ease,visibility 0s linear .5s}
+  html nav#siteNav.open .npanel{clip-path:inset(0 0 0 0);opacity:1;visibility:visible;transition:clip-path .5s var(--ease-out,cubic-bezier(.16,1,.3,1)),opacity .25s ease,visibility 0s}
+  html nav#siteNav .npanel>a,html nav#siteNav .npanel>.nacct{display:flex;align-items:center;justify-content:space-between;min-height:54px;padding:0 2px;border:0;border-bottom:1px solid var(--rule);background:none;text-align:left;
+    font:500 1.125rem/1 var(--font-text,Inter,sans-serif);color:var(--ink,#0B2233);cursor:pointer;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .5s var(--ease-out,cubic-bezier(.16,1,.3,1))}
+  html nav#siteNav .npanel>a:not(.npanel-cta):after,html nav#siteNav .npanel>.nacct:after{content:"\2192";color:var(--mute);font-size:1rem}
+  html nav#siteNav.open .npanel>*{opacity:1;transform:none}
+  html nav#siteNav.open .npanel>*:nth-child(1){transition-delay:.04s}html nav#siteNav.open .npanel>*:nth-child(2){transition-delay:.08s}
+  html nav#siteNav.open .npanel>*:nth-child(3){transition-delay:.12s}html nav#siteNav.open .npanel>*:nth-child(4){transition-delay:.16s}
+  html nav#siteNav.open .npanel>*:nth-child(5){transition-delay:.2s}html nav#siteNav.open .npanel>*:nth-child(6){transition-delay:.24s}
+  html nav#siteNav .npanel>.npanel-cta{justify-content:center;min-height:50px;margin-top:14px;border:0;border-radius:999px;background:var(--ink,#0B2233);color:#fff;font-size:1rem}
+}
+@media(max-width:560px){html nav#siteNav .npill{height:38px;padding:0 14px;font-size:.875rem}html nav#siteNav .nlogo img{height:26px}}
+@media(max-width:380px){html nav#siteNav .npill{padding:0 11px;font-size:.8125rem}}
+
+/* account panel */
+.acct{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;background:rgba(7,18,28,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .3s ease}
+.acct:not([hidden]){opacity:1}
+.acct-card{position:relative;width:min(440px,100%);padding:34px 30px 28px;background:#fff;border-radius:20px;box-shadow:0 40px 80px -30px rgba(7,18,28,.6);transform:translateY(14px) scale(.98);transition:transform .45s var(--ease-out,cubic-bezier(.16,1,.3,1))}
+.acct:not([hidden]) .acct-card{transform:none}
+.acct-card h2{font-size:1.75rem!important;margin-bottom:10px}
+.acct-card p{color:var(--ink-2,#46515C);margin-bottom:22px}
+.acct-row{display:flex;gap:10px;flex-wrap:wrap}
+.acct-x{position:absolute;top:12px;right:12px;width:40px;height:40px;border:0;border-radius:50%;background:transparent;font-size:1.6rem;line-height:1;color:var(--mute);cursor:pointer;transition:background .2s}
+.acct-x:hover{background:rgba(11,34,51,.07)}
+
+/* About Us */
+.about{padding-top:clamp(72px,9vw,128px);padding-bottom:clamp(64px,8vw,112px);background:var(--sheet,#FBFCFD)}
+.about h2{max-width:14ch}
+.about-lead{max-width:56ch;margin-top:20px;font-size:clamp(1.0625rem,1.3vw,1.25rem);color:var(--ink-2,#46515C)}
+.about-grid{display:grid;grid-template-columns:repeat(3,1fr);margin-top:clamp(36px,5vw,64px);border-top:1px solid var(--rule-strong,rgba(30,34,40,.28))}
+.about-grid>div{padding:28px 28px 8px 0;border-right:1px solid var(--rule)}
+.about-grid>div+div{padding-left:28px}
+.about-grid>div:last-child{border-right:0}
+.about-grid p{margin-top:8px;max-width:34ch;font-size:.9375rem}
+.about-addr{margin-top:clamp(28px,4vw,48px);color:var(--mute);font-size:.875rem}
+@media(max-width:760px){
+  .about{text-align:center}.about h2,.about-lead,.about-grid p{margin-inline:auto}
+  .about-grid{grid-template-columns:1fr}.about-grid>div,.about-grid>div+div{padding:24px 0;border-right:0;border-bottom:1px solid var(--rule)}.about-grid>div:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){html nav#siteNav .nind,.acct-card{transition-duration:.01ms}}
+
+/* while the phone menu is open the bar is solid, so nothing shows through behind the logo */
+html nav#siteNav.open{background:#fff!important;border-bottom-color:var(--rule)!important}
+@media(max-width:1100px){html nav#siteNav .npanel{background:#fff}}
