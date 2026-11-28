@@ -44,7 +44,7 @@
   var nav = $('nav');
   if (nav) {
     gsap.from(nav, { yPercent: -100, opacity: 0, duration: 1, ease: EASE, delay: 0.1 });
-    gsap.from($$('.nl a', nav), { y: -14, opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.06, delay: 0.45 });
+    gsap.from($$('.nl > a, .nl > .nacct', nav), { y: -14, opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.06, delay: 0.45 });
     gsap.from($$('.nr a', nav), { opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.06, delay: 0.55 });   // fade only: the magnetic hover owns this button's y
   }
 

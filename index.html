@@ -945,13 +945,20 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
 </style>
 </head>
 <body>
-<nav>
-  <div class="nl"><a href="#shop">Shop plans</a><a href="#modify">Modify a plan</a><a href="#bring">Upload yours</a><a href="#clear">Pricing</a></div>
-  <a class="nlogo" href="#top" aria-label="UBC"><img src="assets/brand/ubc-mark.webp" alt="UBC"></a>
-  <div class="nr"><a class="nlk" href="#contact">Contact</a><a class="npill" href="#contact">Request a custom plan</a></div>
+<nav id="siteNav">
+  <a class="nlogo" href="#top" aria-label="Home Plans for Steel, home"><img src="assets/brand/ubc-mark.webp" alt="UBC"></a>
+  <div class="nl" id="nl" role="navigation" aria-label="Main"><span class="nind" aria-hidden="true"></span><a href="#top" data-k="home">Home</a><a href="#shop" data-k="shop">Shop BIM Models</a><a href="#story" data-k="how">How It Works</a><a href="#about" data-k="about">About Us</a><a href="#contact" data-k="contact">Contact Us</a><button type="button" class="nacct" id="acctBtn" data-k="acct" aria-haspopup="dialog">My account</button></div>
+  <div class="nr"><a class="npill" href="mailto:marketing@homeplansforsteel.com?subject=Custom%20plan%20request">Request a custom plan</a></div>
   <button class="nmenu" id="nmenu" type="button" aria-label="Menu" aria-expanded="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8h16M4 16h16"/></svg></button>
-  <div class="npanel" id="npanel"><a href="#shop">Shop plans</a><a href="#modify">Modify a plan</a><a href="#bring">Upload yours</a><a href="#clear">Pricing</a><a href="#p2m">3D model</a><a href="#contact">Contact</a></div>
+  <div class="npanel" id="npanel"><a href="#top">Home</a><a href="#shop">Shop BIM Models</a><a href="#story">How It Works</a><a href="#about">About Us</a><a href="#contact">Contact Us</a><button type="button" class="nacct" data-open-account>My account</button><a class="npanel-cta" href="mailto:marketing@homeplansforsteel.com?subject=Custom%20plan%20request">Request a custom plan</a></div>
 </nav>
+<div class="acct" id="acct" role="dialog" aria-modal="true" aria-labelledby="acctT" hidden>
+  <div class="acct-card"><button type="button" class="acct-x" id="acctX" aria-label="Close">&times;</button>
+    <h2 id="acctT">My account</h2>
+    <p>Online accounts are on the way: saved plans, your change requests and quotes in one place. Until then we handle everything by email, and a person answers.</p>
+    <div class="acct-row"><a class="btn" href="mailto:marketing@homeplansforsteel.com?subject=My%20account">Email us</a><a class="skb" href="tel:+12144446150">Call +1 (214) 444-6150</a></div>
+  </div>
+</div>
 <div id="home">
 <header class="hero" id="top">
   <canvas class="draft2" id="draft" aria-hidden="true"></canvas>
@@ -1036,6 +1043,16 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
   </div>
   <p class="arch">Architect? <a href="#contact">Upload your plans and sell them on UBC</a> (coming soon).</p>
 </section></div>
+<section class="about wrap" id="about">
+  <h2>Plans made in one place.</h2>
+  <p class="about-lead">UBC Technology Services produces every plan in-house: the architecture, the steel framing model, the shop drawings and the machine files. One team, one price, no contractor and no reseller in between.</p>
+  <div class="about-grid">
+    <div><h3>Architectural team</h3><p>Floor plans and elevations, drawn and checked by the people who answer your questions.</p></div>
+    <div><h3>BIM modellers</h3><p>A steel framing model for every plan, so every stud, track and opening is accounted for before anything is cut.</p></div>
+    <div><h3>Detailers</h3><p>Shop drawings and cut lists, plus machine files made for the machine you actually run.</p></div>
+  </div>
+  <p class="about-addr">UBC Technology Services Inc &middot; 885 Gold Hill Rd #3083, Fort Mill, SC 29708</p>
+</section>
 <footer class="hf" id="foot"><span id="contact"></span>
   <div class="hf-3d" id="p2m">
     <div class="hf-3d-head"><span class="tag"><b>UPLOAD</b>Plan in, model out</span><h2>Upload a plan. We build the 3D model.</h2><p>Rooms, walls and openings are read from your drawing and rebuilt as a model you can walk around.</p><a class="hf-cta" href="mailto:marketing@homeplansforsteel.com?subject=Custom%20plan%20request">Request a custom plan <span aria-hidden="true">&rarr;</span></a></div>
@@ -1318,9 +1335,10 @@ function startDemo(){if(demo)return;var cx=PR.x+PR.w/2,cy=PR.y+PR.h/2,w=Math.min
 function stepDemo(now){if(!demo)return;if(now<demo.next)return;var s=demo.strokes[demo.si];if(!s){demo=null;lastUp=now;return}
   if(demo.pi===0){cur=[]}var p=s[demo.pi];cur.push(p);cursor.x=p[0];cursor.y=p[1];cursor.on=true;penSpeed=260;demo.pi++;demo.next=now+78;if(demo.pi>=s.length){raw.push(cur);cur=null;demo.si++;demo.pi=0;demo.next=now+700;penSpeed=0}}
 function pos(e){var r=hero.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
-pad.addEventListener('pointerdown',function(e){if(state==='3d'||state==='ext3'||state==='back')return;e.preventDefault();if(demoRun||state!=='draw'){raw=[];pts3=null;e3=0}demo=null;demoRun=false;hint.classList.add('off');userTouched=true;pad.setPointerCapture(e.pointerId);var p=pos(e);if(state==='idle'||state==='plan'){if(state==='plan'){}}setState('draw');clean=null;cur=[p];cursor.x=p[0];cursor.y=p[1];cursor.on=true});
-pad.addEventListener('pointermove',function(e){var p=pos(e);if(cursor.on){penSpeed=Math.hypot(p[0]-cursor.x,p[1]-cursor.y)*60}cursor.x=p[0];cursor.y=p[1];cursor.on=true;if(cur){var l=cur[cur.length-1];if(D(l,p)>2.5)cur.push(p)}});
-function up(){if(!cur)return;if(cur.length>1)raw.push(cur);cur=null;lastUp=performance.now();penSpeed=0}
+pad.addEventListener('pointerdown',function(e){if(state==='3d'||state==='ext3'||state==='back')return;e.preventDefault();if(demoRun||state!=='draw'){raw=[];pts3=null;e3=0}demo=null;demoRun=false;padDown=true;hint.classList.add('off');userTouched=true;pad.setPointerCapture(e.pointerId);var p=pos(e);if(state==='idle'||state==='plan'){if(state==='plan'){}}setState('draw');clean=null;cur=[p];cursor.x=p[0];cursor.y=p[1];cursor.on=true});
+var padDown=false; /* the target only reacts to the pointer while the user is actually drawing (button held); hovering never steers it and never touches the self-drawing demo */
+pad.addEventListener('pointermove',function(e){if(!padDown||demo)return;var p=pos(e);if(cursor.on){penSpeed=Math.hypot(p[0]-cursor.x,p[1]-cursor.y)*60}cursor.x=p[0];cursor.y=p[1];cursor.on=true;if(cur){var l=cur[cur.length-1];if(D(l,p)>2.5)cur.push(p)}});
+function up(){padDown=false;if(!cur)return;if(cur.length>1)raw.push(cur);cur=null;lastUp=performance.now();penSpeed=0}
 pad.addEventListener('pointerup',up);pad.addEventListener('pointercancel',up);pad.addEventListener('pointerleave',function(){penSpeed=0});
 function reset(){raw=[];cur=null;clean=null;pts3=null;demo=null;e3=0;hint.classList.remove('off');setState('idle')}
 $('#hClear').onclick=function(){demoRun=false;reset()};
@@ -1375,6 +1393,7 @@ new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){start();i
 <link rel="stylesheet" href="sections.css">
 <link rel="stylesheet" href="clean.css">
 <link rel="stylesheet" href="design.css">
+<link rel="stylesheet" href="nav.css">
 <script src="animations.js"></script>
 <script>/* Address of the hosted plan-reading service (see server/). Leave empty to switch automatic reading of uploaded plans off. */
 window.UBC_DETECT_URL=window.UBC_DETECT_URL||"";</script>
@@ -1382,5 +1401,6 @@ window.UBC_DETECT_URL=window.UBC_DETECT_URL||"";</script>
 <script src="story.js"></script>
 <script src="menu.js"></script>
 <script src="touch.js"></script>
+<script src="nav.js"></script>
 </body>
 </html>

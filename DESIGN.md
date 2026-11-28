@@ -77,23 +77,22 @@ Rules:
 
 ## 5. Shape, surfaces and depth
 
-**Sheets are square, tools are round.**
+**Everything is square: sheets and tools alike.**
 
 - **Sheets** (sections, cards, figures, tables): square corners, 1px `--rule` lines, 9 to 12px diamond corner marks where cells meet. They are the drawing.
-- **Tools** (buttons, chips, inputs, menus): rounded. Buttons and chips are pills (`999px`); inputs and panels are `12px`; the editor window is `20px`.
+- **Tools** (buttons, chips, the menu button): **rectangular, 0 radius, always.** Never pills, never rounded. This is the original look of the site and it must stay. (Inputs are square too; the editor window keeps its soft `20px`.)
 - Elevation is rare and soft: `--sh-sm` for hover on cards, `--sh-md` for menus, `--sh-lg` for the editor window and sticky cards. No hard shadows, no glow except the white dot cloud in the footer.
 - Borders carry the structure; shadows only confirm that something is lifted.
 
 ## 6. Components
 
-**Top bar.** White, 64px, one hairline underneath. Logo centred, links left, Contact and **Request a custom plan** right. The request button is an ink pill, always visible and always sticky (on phones it sits beside the hamburger). Links get a 2px accent underline that draws in on hover; the current page is ink with the underline held.
+**Top bar.** White, 64px, one hairline underneath. Logo centred, links left, Contact and **Request a custom plan** right. The request button is a **black rectangle** (`#0B0C0E`, white text), always visible and always sticky (on phones it sits beside the hamburger). A soft highlight slides to the link under the pointer and rests on the current section.
 
-**Buttons.** 44px minimum height, pill, Inter 500 at 15px.
-- *Primary*: ink fill, white text. Hover: slightly lighter ink. One per screen section.
-- *Secondary*: white fill, `--rule-strong` outline, ink text. Hover: ink outline.
-- *Accent*: accent fill, white text. Only for the final commit of a task ("Send revisions").
-- *On black* (footer): white fill, black text.
-- Press: scale to 0.98 for 120ms. Focus: 2px `--blue` ring with 3px offset.
+**Buttons.** **Rectangular and black, as in the original site.** 44px minimum height, 0 radius, Inter 500 to 600.
+- *Primary*: `#0B0C0E` fill and border, white text. Hover: `#262A30`.
+- *Secondary*: white fill, 1px `#0B0C0E` outline, black text. Hover: the outline thickens.
+- *On black* (footer): white fill, black text, still rectangular.
+- No pills, no accent-red buttons, no shadows on buttons. Focus: 2px `--blue` ring with 3px offset.
 
 **Links with arrows** ("Browse plans ->"). Inter 500, ink, 1px underline that grows from the left on hover.
 
@@ -101,13 +100,13 @@ Rules:
 
 **Feature cells.** Three across on desktop, stacked on phones. Icon (32px line art, 1.2px stroke) and one or two sentences. No titles.
 
-**Chips.** 36px pill, Inter 500 at 13.5px, hairline outline. Selected state: ink fill.
+**Chips.** Rectangular, 36px, Inter 500 at 13.5px, hairline outline. Selected state: ink fill.
 
 **Inputs.** 12px radius, 1px `--rule-strong`, 48px tall, 15px text. Focus: blue ring.
 
 **Modify editor.** A 20px window with the plan on the left and the change panel on the right. Selection is violet (`--violet`), applied changes are green (`--ok`), detected doors teal, windows green, walls amber. Every change gets a numbered marker.
 
-**Footer.** Black. Heading, one sentence and one white pill at the top left; the plan (bottom left) turns into dots that stream to the 3D model (top right). Address, phone, email and links below in white. A faint outlined wordmark slides along the bottom.
+**Footer.** Black. Heading, one sentence and one white rectangular button at the top left; the plan (bottom left) turns into dots that stream to the 3D model (top right). Address, phone, email and links below in white. A faint outlined wordmark slides along the bottom.
 
 ## 7. Motion
 
@@ -147,7 +146,7 @@ Plain, short, concrete. Say what it is and what it costs. Sentence case. Numbers
 | Do | Don't |
 |---|---|
 | One accent moment per screen | Sprinkle red everywhere |
-| Square sheets, round tools | Round the sheets or square the buttons |
+| Square, black buttons (the original look) | Round, pill-shaped or coloured buttons |
 | Let hairlines do the structure | Boxes inside boxes with shadows |
 | Hide-then-reveal animations | Show the final state, then animate |
 | Centre text on phones, left-align on desktop where the layout is split | Mix alignments within one block |
