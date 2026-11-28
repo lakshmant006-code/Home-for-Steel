@@ -1201,9 +1201,9 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
       if(q<1){var pp=PL[i%PL.length],a=pmap(pp[0],pp[1]);x=a[0]+(x-a[0])*e;y=a[1]+(y-a[1])*e-Math.sin(Math.PI*e)*H*.08}
       var dep=1-Math.max(0,Math.min(1,(dpt[i]+60)/120));var tn=mt[i]&255;ctx.globalAlpha=q<1?Math.min(1,e*3):(gh?.3+.3*dep:.6+.4*dep);ctx.fillStyle='#fff';ctx.fillRect(x,y,.78,.78)}
     // spacey glitter: points on the house flash on their own rhythm, and sparkles drift through the dark
-    for(var g1=0;g1<NM;g1+=9){var gc=((ys[g1]/GS)|0)*GW+((xs[g1]/GS)|0);if(mt[g1]>=256||gc<0||gc>=zb.length||dpt[g1]>zb[gc]+2.4)continue;
-      var tw=Math.sin(t*(.6+(g1%7)*.33)+g1*1.7);if(tw<.88)continue;var gs=(tw-.88)/.12;
-      ctx.globalAlpha=.3+.7*gs;ctx.fillStyle='#fff';ctx.fillRect(xs[g1]-1,ys[g1]-1,2.4,2.4);if(gs>.9)fstar(xs[g1],ys[g1],3+gs*3,gs*.9)}
+    for(var g1=0;g1<NM;g1+=13){var gc=((ys[g1]/GS)|0)*GW+((xs[g1]/GS)|0);if(mt[g1]>=256||gc<0||gc>=zb.length||dpt[g1]>zb[gc]+2.4)continue;
+      var tw=Math.sin(t*(.6+(g1%7)*.33)+g1*1.7);if(tw<.91)continue;var gs=(tw-.91)/.09;
+      ctx.globalAlpha=.3+.7*gs;ctx.fillStyle='#fff';ctx.fillRect(xs[g1]-1,ys[g1]-1,2.4,2.4);if(gs>.94)fstar(xs[g1],ys[g1],3+gs*3,gs*.9)}
     if(FDW!==W){FD=[];var nd=W<700?46:110;for(var d1=0;d1<nd;d1++)FD.push({x:Math.random()*W,y:Math.random()*H,r:.8+Math.random()*1.8,ph:Math.random()*6.283,sp:.6+Math.random()*1.6,vy:-(2+Math.random()*6)});FDW=W}
     for(var d2=0;d2<FD.length;d2++){var q=FD[d2],yy=((q.y+q.vy*t)%H+H)%H,tw2=(Math.sin(t*q.sp+q.ph)+1)/2;fstar(q.x,yy,q.r*2.2,.12+.75*tw2*tw2)}
     ctx.globalAlpha=1;
