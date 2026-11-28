@@ -172,9 +172,9 @@
   function readUpload(imgEl, mine) {
     if (fig !== mine) return;
     note.textContent = 'Reading your plan…';
-    var run = window.UBCPlanModel ? window.UBCPlanModel.detect(imgEl, function (stage, f) {
+    var run = window.UBCPlanModel ? window.UBCPlanModel.detect(imgEl, function (stage, f, part, parts) {
       if (fig !== mine) return;
-      note.textContent = stage === 'download' ? 'Downloading the plan reader (first time only, about 50 MB)… ' + Math.round(f * 100) + '%' : 'Reading your plan with the detection model. This takes a few seconds…';
+      note.textContent = stage === 'download' ? 'Downloading the plan reader (first time only, about 50 MB)… ' + Math.round(f * 100) + '%' : parts > 1 ? 'This is a large sheet, so we read it in ' + parts + ' parts to catch small doors and windows. Part ' + part + ' of ' + parts + '…' : 'Reading your plan with the detection model. This takes a few seconds…';
     }) : Promise.reject(new Error('no model'));
     run.then(function (all) {
       if (fig !== mine) return;
