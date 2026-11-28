@@ -1,0 +1,138 @@
+/* ==========================================================================
+   Design system implementation. The rules live in DESIGN.md; this file is loaded last so it wins.
+   Sheets are square, tools are round. Three type families, three jobs.
+   ========================================================================== */
+
+:root{
+  /* colour */
+  --ink:#0B2233; --ink-2:#46515C; --mute:#5B6B78;
+  --paper:#FFFFFF; --sheet:#FBFCFD; --canvas:#F4F6F8;
+  --rule:rgba(30,34,40,.14); --rule-strong:rgba(30,34,40,.28);
+  --accent:#B3152B; --blue:#2E6A8E; --violet:#6D4CFF; --ok:#1F9D62;
+  --ink2:#46515C; --lime:#B3152B;                        /* legacy names used by older rules */
+  /* type */
+  --font-display:"Inter Tight",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --font-text:"Inter",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --fd:var(--font-display); --fb:var(--font-text); --f:var(--font-display); --m:var(--font-mono);
+  /* shape, depth, motion */
+  --r-pill:999px; --r-in:12px; --r-win:20px;
+  --sh-sm:0 6px 18px -10px rgba(11,34,51,.35);
+  --sh-md:0 14px 34px -16px rgba(11,34,51,.38);
+  --sh-lg:0 30px 60px -34px rgba(11,34,51,.5);
+  --ease-out:cubic-bezier(.16,1,.3,1); --ease-io:cubic-bezier(.65,0,.35,1);
+  --t-fast:.15s; --t-base:.25s;
+}
+
+/* ---------- base ---------- */
+html{scroll-padding-top:84px;scrollbar-color:#b7c0c8 transparent}
+body{font-family:var(--font-text)!important;font-size:1rem;line-height:1.6;color:var(--ink);background:var(--sheet)!important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"kern","calt"}
+::selection{background:rgba(179,21,43,.16);color:var(--ink)}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:6px}
+a{transition:color var(--t-base)}
+p{text-wrap:pretty}
+
+/* ---------- typography ---------- */
+h1,h2,h3,h4,.lead{font-family:var(--font-display)!important;font-weight:600!important;color:var(--ink);text-wrap:balance}
+h1{font-size:clamp(2.5rem,6vw,5rem);line-height:1.02;letter-spacing:-.04em}
+h2,.sheet>h2.lead,.sh-head h2,.dm-l h2,.faq2 h2{font-size:clamp(2rem,3.8vw,3.25rem)!important;line-height:1.06!important;letter-spacing:-.035em!important}
+h3,.gcard h3,.c3 h3,.cl-card h3,.pdetail h3{font-size:clamp(1.25rem,1.7vw,1.625rem)!important;line-height:1.18!important;letter-spacing:-.02em!important}
+.hero h1{font-size:clamp(2.25rem,4.9vw,4.4rem)!important;line-height:1.04!important;letter-spacing:-.04em!important;max-width:20ch;margin-inline:auto}
+p,.sub,.st p,.capi p,.ft p,.c3 p,.mut{font-size:1rem;line-height:1.6;color:var(--ink-2);letter-spacing:0}
+.mut,.pc small{color:var(--mute)}
+.pr,.big,.pb .val,.pb .sig b,.pc .pr,.files span{font-variant-numeric:tabular-nums}
+
+/* ---------- top bar ---------- */
+nav{background:rgba(255,255,255,.9)!important;-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--rule)!important;box-shadow:none!important}
+nav .nl a,nav .nlk{position:relative;font:500 .9375rem/1 var(--font-text);letter-spacing:0;color:var(--ink);padding:10px 14px;transition:color var(--t-base)}
+nav .nl a:after,nav .nlk:after{content:"";position:absolute;left:14px;right:14px;bottom:4px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:0 50%;transition:transform .35s var(--ease-out)}
+nav .nl a:hover:after,nav .nlk:hover:after{transform:scaleX(1)}
+nav .nr{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+nav .npill{display:inline-flex!important;align-items:center;height:40px;padding:0 18px!important;margin:0 0 0 8px!important;border:0!important;border-radius:var(--r-pill)!important;background:var(--ink)!important;color:#fff!important;font:500 .9375rem/1 var(--font-text)!important;letter-spacing:0;box-shadow:none!important;transition:background var(--t-base),transform var(--t-fast)}
+nav .npill:hover{background:#15405c!important;transform:none!important}
+nav .npill:active{transform:scale(.97)!important}
+nav .nlogo img{height:30px}
+.nmenu{border-radius:var(--r-pill)!important}
+
+/* ---------- buttons and links (tools are round) ---------- */
+.btn,.skb,.sk-go,.hero .ghost,.m2-own .skb,button.skb,label.skb{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 22px;border-radius:var(--r-pill)!important;
+  font:500 .9375rem/1 var(--font-text)!important;letter-spacing:0!important;text-transform:none;cursor:pointer;
+  transition:background var(--t-base),border-color var(--t-base),color var(--t-base),transform var(--t-fast),box-shadow var(--t-base)}
+.btn,.btn.dark,.sk-go.pri{background:var(--ink);color:#fff;border:1px solid var(--ink)}
+.btn:hover,.btn.dark:hover,.sk-go.pri:hover{background:#15405c;border-color:#15405c}
+.skb,.sk-go,.hero .ghost,.m2-own .skb{background:var(--paper);color:var(--ink);border:1px solid var(--rule-strong)}
+.skb:hover,.sk-go:hover,.hero .ghost:hover,.m2-own .skb:hover{border-color:var(--ink)}
+.skb.red{background:var(--accent);border-color:var(--accent);color:#fff}
+.skb.red:hover{background:#8f1022;border-color:#8f1022}
+.btn:active,.skb:active,.sk-go:active{transform:scale(.98)}
+.btn:disabled,.m2-chips button:disabled{opacity:.4;cursor:not-allowed}
+#m2Apply{width:100%}
+footer.hf a.hf-cta{min-height:48px;padding:0 24px}
+
+/* links that end in an arrow (e.g. "Browse plans ->"): sentence case, underline draws in */
+.stgo{font:500 .9375rem/1.2 var(--font-text)!important;letter-spacing:0!important;text-transform:none!important;color:var(--ink);display:inline-flex;align-items:center;gap:6px;padding:2px 0;background:linear-gradient(var(--ink),var(--ink)) 0 100%/100% 1px no-repeat;transition:background-size .35s var(--ease-out),color var(--t-base)}
+.stgo:hover{background-size:0 1px;color:var(--accent)}
+.capi .stgo{margin-top:6px;align-self:flex-start}
+
+/* story caption: a step headline, so it is sized as an H2 */
+.capi h3,.st h3{font-size:clamp(1.75rem,3vw,2.75rem)!important;line-height:1.06!important;letter-spacing:-.035em!important;max-width:16ch}
+.capi p{max-width:38ch}
+
+/* ---------- surfaces: sheets are square ---------- */
+.cl-card,.pc,.ft,.c3,.pdetail,.mod-side,.finder,.drop{border-radius:0!important}
+.pc,.cl-card,.c3,.pdetail{background:var(--paper);border:1px solid var(--rule);transition:border-color var(--t-base),box-shadow var(--t-base)}
+.pc:hover,.cl-card:hover,.c3:hover{border-color:var(--ink);box-shadow:var(--sh-sm)}   /* hover never moves borders or corner marks */
+.pc b,.cl-card h3{font-family:var(--font-display);font-weight:600;letter-spacing:-.015em}
+.pc b{font-size:1.0625rem}
+.pim{background:var(--paper)}
+.sg-r .card{box-shadow:var(--sh-lg)!important;border-radius:0!important}
+
+/* feature cells */
+.ft{padding:28px 24px 32px}
+.ft p{max-width:32ch;font-size:.9375rem;color:var(--ink-2)}
+
+/* ---------- chips and inputs ---------- */
+.chips2 button,.m2-chips button,.m2-rooms button{min-height:36px;padding:0 14px;border-radius:var(--r-pill)!important;font:500 .84375rem/1 var(--font-text)!important;letter-spacing:0!important;text-transform:none!important}
+.chips2 button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+input[type=text],input[type=email],input[type=tel],input[type=search],textarea,select,.m2-ask input{font:400 .9375rem/1.4 var(--font-text);color:var(--ink);background:var(--paper);border:1px solid var(--rule-strong);border-radius:var(--r-in);padding:12px 14px;min-height:48px;transition:border-color var(--t-base),box-shadow var(--t-base)}
+input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,106,142,.22)}
+.m2-ask input{min-height:44px}
+
+/* ---------- modify editor ---------- */
+.m2-win{border-radius:var(--r-win);box-shadow:var(--sh-lg);border-color:var(--rule)}
+.m2-bar{background:var(--sheet);padding:12px 16px;gap:10px}
+.m2-hint{font:500 .875rem/1.3 var(--font-text);color:var(--mute)}
+.m2-lbl{font:500 .75rem/1.4 var(--font-mono);letter-spacing:.06em}
+.m2-quote b{font-family:var(--font-display);font-size:1.0625rem}
+
+/* ---------- hero ---------- */
+.hero{padding-top:clamp(120px,16vh,168px)}
+.hero .snd{border-radius:var(--r-pill)!important}
+.sk-hint b{font-family:var(--font-display)}
+
+/* ---------- section rhythm ---------- */
+.sh-head .mid{padding-block:clamp(48px,6vw,96px)}
+.sh-head p{font-size:clamp(1.0625rem,1.3vw,1.25rem);color:var(--ink-2);max-width:34ch}
+
+/* ---------- footer text follows the same type rules ---------- */
+footer.hf{font-family:var(--font-text)}
+footer.hf .hf-3d-head h2{font-size:clamp(1.9rem,3.4vw,3rem)!important;letter-spacing:-.035em!important}
+footer.hf .hf-grid{font-size:1rem;line-height:1.65}
+footer.hf .hf-copy{font-size:.875rem}
+
+/* ---------- phones ---------- */
+@media(max-width:760px){
+  .hero h1{font-size:clamp(2rem,9vw,2.6rem)!important;max-width:none}
+  .btn,.skb,.sk-go{min-height:46px}
+  .st p,.capi p{font-size:.9375rem}
+}
+
+/* ---------- reduced motion: no movement, instant states ---------- */
+@media(prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
+}
+
+/* the hidden attribute always wins over component display rules */
+[hidden]{display:none!important}
