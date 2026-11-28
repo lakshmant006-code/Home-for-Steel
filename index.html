@@ -1335,9 +1335,10 @@ function startDemo(){if(demo)return;var cx=PR.x+PR.w/2,cy=PR.y+PR.h/2,w=Math.min
 function stepDemo(now){if(!demo)return;if(now<demo.next)return;var s=demo.strokes[demo.si];if(!s){demo=null;lastUp=now;return}
   if(demo.pi===0){cur=[]}var p=s[demo.pi];cur.push(p);cursor.x=p[0];cursor.y=p[1];cursor.on=true;penSpeed=260;demo.pi++;demo.next=now+78;if(demo.pi>=s.length){raw.push(cur);cur=null;demo.si++;demo.pi=0;demo.next=now+700;penSpeed=0}}
 function pos(e){var r=hero.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
-pad.addEventListener('pointerdown',function(e){if(state==='3d'||state==='ext3'||state==='back')return;e.preventDefault();if(demoRun||state!=='draw'){raw=[];pts3=null;e3=0}demo=null;demoRun=false;hint.classList.add('off');userTouched=true;pad.setPointerCapture(e.pointerId);var p=pos(e);if(state==='idle'||state==='plan'){if(state==='plan'){}}setState('draw');clean=null;cur=[p];cursor.x=p[0];cursor.y=p[1];cursor.on=true});
-pad.addEventListener('pointermove',function(e){var p=pos(e);if(cursor.on){penSpeed=Math.hypot(p[0]-cursor.x,p[1]-cursor.y)*60}cursor.x=p[0];cursor.y=p[1];cursor.on=true;if(cur){var l=cur[cur.length-1];if(D(l,p)>2.5)cur.push(p)}});
-function up(){if(!cur)return;if(cur.length>1)raw.push(cur);cur=null;lastUp=performance.now();penSpeed=0}
+pad.addEventListener('pointerdown',function(e){if(state==='3d'||state==='ext3'||state==='back')return;e.preventDefault();if(demoRun||state!=='draw'){raw=[];pts3=null;e3=0}demo=null;demoRun=false;padDown=true;hint.classList.add('off');userTouched=true;pad.setPointerCapture(e.pointerId);var p=pos(e);if(state==='idle'||state==='plan'){if(state==='plan'){}}setState('draw');clean=null;cur=[p];cursor.x=p[0];cursor.y=p[1];cursor.on=true});
+var padDown=false; /* the target only reacts to the pointer while the user is actually drawing (button held); hovering never steers it and never touches the self-drawing demo */
+pad.addEventListener('pointermove',function(e){if(!padDown||demo)return;var p=pos(e);if(cursor.on){penSpeed=Math.hypot(p[0]-cursor.x,p[1]-cursor.y)*60}cursor.x=p[0];cursor.y=p[1];cursor.on=true;if(cur){var l=cur[cur.length-1];if(D(l,p)>2.5)cur.push(p)}});
+function up(){padDown=false;if(!cur)return;if(cur.length>1)raw.push(cur);cur=null;lastUp=performance.now();penSpeed=0}
 pad.addEventListener('pointerup',up);pad.addEventListener('pointercancel',up);pad.addEventListener('pointerleave',function(){penSpeed=0});
 function reset(){raw=[];cur=null;clean=null;pts3=null;demo=null;e3=0;hint.classList.remove('off');setState('idle')}
 $('#hClear').onclick=function(){demoRun=false;reset()};
