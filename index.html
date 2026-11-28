@@ -1223,11 +1223,12 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
 /* ---------- separate views in one page: home, shop plans, modify a plan, upload your plan ---------- */
 (function(){var home=document.getElementById('home'),V={'#shop':document.getElementById('shopPage'),'#modify':document.getElementById('modifyPage'),'#bring':document.getElementById('bringPage'),'#contact':document.getElementById('contactPage')},T={'#shop':'Shop plans','#modify':'Modify a plan','#bring':'Upload your plan','#contact':'Contact us'};if(!home)return;
   function route(){var hs=location.hash,pg=V[hs];home.hidden=!!pg;Object.keys(V).forEach(function(k){V[k].hidden=(V[k]!==pg)});document.title=pg?T[hs]:'Home Plans for Steel';
-    if(pg){scrollTo(0,0);return}
+    var top0=function(){scrollTo({top:0,left:0,behavior:'instant'})}; /* instant, never smooth: the page height changes while pages swap and a smooth scroll gets thrown off (it used to end up halfway down or in the footer) */
+    if(pg){top0();return}
     dispatchEvent(new Event('resize'));
-    if(hs&&hs.length>1){setTimeout(function(){var el=document.getElementById(hs.slice(1));if(el)el.scrollIntoView()},60)}else scrollTo(0,0)}
+    if(hs&&hs.length>1&&hs!=='#top'){top0();setTimeout(function(){var el=document.getElementById(hs.slice(1));if(el)el.scrollIntoView({behavior:'instant',block:'start'})},60)}else top0()}
   addEventListener('hashchange',route);route();
-  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href^="#"]');if(a&&V[a.getAttribute('href')]&&location.hash===a.getAttribute('href')){e.preventDefault();scrollTo(0,0)}})})();
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href^="#"]');if(a&&V[a.getAttribute('href')]&&location.hash===a.getAttribute('href')){e.preventDefault();scrollTo({top:0,left:0,behavior:'instant'})}})})();
 
 /* ---------- hero: draw a house, watch it become a drafted plan, press one button to extrude it into 3D ---------- */
 (function(){
@@ -1412,7 +1413,6 @@ new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){start();i
 .gx .reveal{transition:none}
 .gx-m{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.12em;margin-bottom:-.12em}
 .gx-w{display:inline-block;will-change:transform}
-.gx-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:9999;background:linear-gradient(90deg,#2E6A8E,#B3152B);transform:scaleX(0);transform-origin:0 50%;pointer-events:none}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
