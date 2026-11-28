@@ -1054,7 +1054,6 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
   <p class="arch">Architect? <a href="#contact">Upload your plans and sell them on UBC</a> (coming soon).</p>
 </section></div>
 <div id="contactPage" class="vpage" hidden><section class="contact" id="contact" aria-labelledby="cT">
-  <canvas class="cg-cv" id="cgCv" role="img" aria-label="A 3D model of a house made of softly glittering white dots"></canvas>
   <div class="cg-in">
     <form class="cg-form" id="cgForm" novalidate>
       <h2 id="cT">Contact us</h2>
@@ -1075,6 +1074,7 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
       <p class="cg-note" id="cgNote">Sending opens your email app with this message ready to go.</p>
     </form>
   </div>
+  <div class="cg-art" aria-hidden="true"></div>
 </section></div>
 <footer class="hf" id="foot">
   <div class="hf-3d" id="p2m">
@@ -1184,7 +1184,8 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     /* streaming dots land on the bottom fifth of the model (they leave from the top edge of the plan) */
     var by0=1e9,by1=-1e9;for(var i=0;i<n;i++){if(my[i]<by0)by0=my[i];if(my[i]>by1)by1=my[i]}var cut=by0+(by1-by0)*.22,BOT=[];for(var i=0;i<n;i++)if(my[i]<cut)BOT.push(i);if(!BOT.length)BOT.push(0);
     ST=[];for(var i=0;i<(innerWidth<760?3000:7500);i++)ST.push({k:BOT[(Math.random()*BOT.length)|0],ph:Math.random(),sp:.16+Math.random()*.16,j:Math.random()});buildPlan();ready=true}
-  var GS=2,GW=0,GH=0,zb=null;
+  var GS=2,GW=0,GH=0,zb=null,FD=[],FDW=0;
+  function fstar(x,y,r,a){ctx.globalAlpha=a;ctx.fillStyle='#fff';ctx.fillRect(x-r,y-.5,r*2,1);ctx.fillRect(x-.5,y-r,1,r*2)}
   function ez(u){return u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2}
   function proj(i,ca,sa,cp,sp,f,D,cx,cy,o){var x=mx[i]*ca-mz[i]*sa,z=mx[i]*sa+mz[i]*ca,y=my[i],y2=y*cp-z*sp,z2=-(z*cp+y*sp),k=f/(D+z2);o[0]=cx+x*k;o[1]=cy-y2*k;o[2]=z2}
   var out=[0,0,0];
@@ -1199,6 +1200,13 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
       var dl=(mx[i]*7.3+mz[i]*3.1)%1;dl=dl<0?dl+1:dl;var q=Math.min(1,Math.max(0,build*1.5-dl*.5));if(q<=0)continue;var e=ez(q),x=xs[i],y=ys[i];
       if(q<1){var pp=PL[i%PL.length],a=pmap(pp[0],pp[1]);x=a[0]+(x-a[0])*e;y=a[1]+(y-a[1])*e-Math.sin(Math.PI*e)*H*.08}
       var dep=1-Math.max(0,Math.min(1,(dpt[i]+60)/120));var tn=mt[i]&255;ctx.globalAlpha=q<1?Math.min(1,e*3):(gh?.3+.3*dep:.6+.4*dep);ctx.fillStyle='#fff';ctx.fillRect(x,y,.78,.78)}
+    // spacey glitter: points on the house flash on their own rhythm, and sparkles drift through the dark
+    for(var g1=0;g1<NM;g1+=13){var gc=((ys[g1]/GS)|0)*GW+((xs[g1]/GS)|0);if(mt[g1]>=256||gc<0||gc>=zb.length||dpt[g1]>zb[gc]+2.4)continue;
+      var tw=Math.sin(t*(.6+(g1%7)*.33)+g1*1.7);if(tw<.91)continue;var gs=(tw-.91)/.09;
+      ctx.globalAlpha=.3+.7*gs;ctx.fillStyle='#fff';ctx.fillRect(xs[g1]-1,ys[g1]-1,2.4,2.4);if(gs>.94)fstar(xs[g1],ys[g1],3+gs*3,gs*.9)}
+    if(FDW!==W){FD=[];var nd=W<700?46:110;for(var d1=0;d1<nd;d1++)FD.push({x:Math.random()*W,y:Math.random()*H,r:.8+Math.random()*1.8,ph:Math.random()*6.283,sp:.6+Math.random()*1.6,vy:-(2+Math.random()*6)});FDW=W}
+    for(var d2=0;d2<FD.length;d2++){var q=FD[d2],yy=((q.y+q.vy*t)%H+H)%H,tw2=(Math.sin(t*q.sp+q.ph)+1)/2;fstar(q.x,yy,q.r*2.2,.12+.75*tw2*tw2)}
+    ctx.globalAlpha=1;
     // continuous stream: dots leave the plan all the time and land on the model
     for(var s=0;s<ST.length;s++){var p=ST[s],u=(t*p.sp+p.ph)%1;var k=p.k;proj(k,ca,sa,cp,sp,f,D,cx,cy,out);var pq=PL[s%PL.length],a=pmap(pq[0],pq[1]) /* each dot starts exactly on one of the plan's own white lines, front and back */,e=ez(Math.min(1,u*1.25)),x=a[0]+(out[0]-a[0])*e,y=a[1]+(out[1]-a[1])*e-Math.sin(Math.PI*e)*H*(W<760?.1:.03)*(.4+p.j);
       ctx.globalAlpha=u<.08?u/.08:u>.85?(1-u)/.15:1;ctx.fillStyle='#fff';ctx.fillRect(x,y,.75,.75)}
