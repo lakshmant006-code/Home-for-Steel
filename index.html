@@ -1008,6 +1008,16 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
 
 
 
+<section class="about wrap" id="about">
+  <h2>Plans made in one place.</h2>
+  <p class="about-lead">UBC Technology Services produces every plan in-house: the architecture, the steel framing model, the shop drawings and the machine files. One team, one price, no contractor and no reseller in between.</p>
+  <div class="about-grid">
+    <div><h3>Architectural team</h3><p>Floor plans and elevations, drawn and checked by the people who answer your questions.</p></div>
+    <div><h3>BIM modellers</h3><p>A steel framing model for every plan, so every stud, track and opening is accounted for before anything is cut.</p></div>
+    <div><h3>Detailers</h3><p>Shop drawings and cut lists, plus machine files made for the machine you actually run.</p></div>
+  </div>
+  <p class="about-addr">UBC Technology Services Inc &middot; 885 Gold Hill Rd #3083, Fort Mill, SC 29708</p>
+</section>
 </div>
 <div id="shopPage" hidden><section class="shop wrap sheet" id="shop">
   <div class="sh-bar"><span>01 ◇ SHOP READY PLANS</span><span>SHEET A-02</span></div>
@@ -1043,17 +1053,7 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
   </div>
   <p class="arch">Architect? <a href="#contact">Upload your plans and sell them on UBC</a> (coming soon).</p>
 </section></div>
-<section class="about wrap" id="about">
-  <h2>Plans made in one place.</h2>
-  <p class="about-lead">UBC Technology Services produces every plan in-house: the architecture, the steel framing model, the shop drawings and the machine files. One team, one price, no contractor and no reseller in between.</p>
-  <div class="about-grid">
-    <div><h3>Architectural team</h3><p>Floor plans and elevations, drawn and checked by the people who answer your questions.</p></div>
-    <div><h3>BIM modellers</h3><p>A steel framing model for every plan, so every stud, track and opening is accounted for before anything is cut.</p></div>
-    <div><h3>Detailers</h3><p>Shop drawings and cut lists, plus machine files made for the machine you actually run.</p></div>
-  </div>
-  <p class="about-addr">UBC Technology Services Inc &middot; 885 Gold Hill Rd #3083, Fort Mill, SC 29708</p>
-</section>
-<section class="contact" id="contact" aria-labelledby="cT">
+<div id="contactPage" class="vpage" hidden><section class="contact" id="contact" aria-labelledby="cT">
   <canvas class="cg-cv" id="cgCv" role="img" aria-label="A 3D model of a house made of softly glittering white dots"></canvas>
   <div class="cg-in">
     <form class="cg-form" id="cgForm" novalidate>
@@ -1075,7 +1075,7 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
       <p class="cg-note" id="cgNote">Sending opens your email app with this message ready to go.</p>
     </form>
   </div>
-</section>
+</section></div>
 <footer class="hf" id="foot">
   <div class="hf-3d" id="p2m">
     <div class="hf-3d-head"><span class="tag"><b>UPLOAD</b>Plan in, model out</span><h2>Upload a plan. We build the 3D model.</h2><p>Rooms, walls and openings are read from your drawing and rebuilt as a model you can walk around.</p><a class="hf-cta" href="mailto:marketing@homeplansforsteel.com?subject=Custom%20plan%20request">Request a custom plan <span aria-hidden="true">&rarr;</span></a></div>
@@ -1144,7 +1144,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
     ['dragenter','dragover'].forEach(function(ev){d.addEventListener(ev,function(e){e.preventDefault();d.classList.add('over')})});['dragleave','drop'].forEach(function(ev){d.addEventListener(ev,function(e){e.preventDefault();d.classList.remove('over')})});
     d.addEventListener('drop',function(e){var f=e.dataTransfer.files[0];if(f)fn(f,d)});inp.addEventListener('change',function(){if(inp.files[0])fn(inp.files[0],d)})}
   wireDrop($('#drop'),$('#dropIn'),runSearch);
-  wireDrop($('#drop2'),$('#dropIn2'),function(f,d){d.classList.add('busy');setTimeout(function(){d.classList.remove('busy');d.querySelector('b').textContent='Received "'+f.name+'". We will quote it.';var m=$('#m');if(m&&!/uploaded/i.test(m.value))m.value=(m.value?m.value+'\n':'')+'I uploaded my own plan ('+f.name+') on your site. Please quote it.';setTimeout(function(){$('#contact').scrollIntoView({behavior:'smooth'})},900)},1500)});
+  wireDrop($('#drop2'),$('#dropIn2'),function(f,d){d.classList.add('busy');setTimeout(function(){d.classList.remove('busy');d.querySelector('b').textContent='Received "'+f.name+'". We will quote it.';var m=$('#m');if(m&&!/uploaded/i.test(m.value))m.value=(m.value?m.value+'\n':'')+'I uploaded my own plan ('+f.name+') on your site. Please quote it.';setTimeout(function(){location.hash='#contact'},900)},1500)});
 })();
 
 
@@ -1213,7 +1213,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
 
 
 /* ---------- separate views in one page: home, shop plans, modify a plan, upload your plan ---------- */
-(function(){var home=document.getElementById('home'),V={'#shop':document.getElementById('shopPage'),'#modify':document.getElementById('modifyPage'),'#bring':document.getElementById('bringPage')},T={'#shop':'Shop plans','#modify':'Modify a plan','#bring':'Upload your plan'};if(!home)return;
+(function(){var home=document.getElementById('home'),V={'#shop':document.getElementById('shopPage'),'#modify':document.getElementById('modifyPage'),'#bring':document.getElementById('bringPage'),'#contact':document.getElementById('contactPage')},T={'#shop':'Shop plans','#modify':'Modify a plan','#bring':'Upload your plan','#contact':'Contact us'};if(!home)return;
   function route(){var hs=location.hash,pg=V[hs];home.hidden=!!pg;Object.keys(V).forEach(function(k){V[k].hidden=(V[k]!==pg)});document.title=pg?T[hs]:'Home Plans for Steel';
     if(pg){scrollTo(0,0);return}
     dispatchEvent(new Event('resize'));

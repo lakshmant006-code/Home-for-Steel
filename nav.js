@@ -31,12 +31,13 @@
     active = next; if (active) active.classList.add('is-on');
     if (!hovered) place(active, true);
   }
-  var SPY = [['top', 'home'], ['about', 'about'], ['contact', 'contact']];
+  var SPY = [['top', 'home'], ['about', 'about']];
   function spy() {
     var shop = document.getElementById('shopPage'), mod = document.getElementById('modifyPage'), bring = document.getElementById('bringPage'), home = document.getElementById('home');
     if (shop && !shop.hidden) return setActive('shop');
     if (mod && !mod.hidden) return setActive('modify');
     if (bring && !bring.hidden) return setActive('bring');
+    var cp = document.getElementById('contactPage'); if (cp && !cp.hidden) return setActive('contact');
     if (home && home.hidden) return setActive(null);
     var y = 140, k = 'home';
     SPY.forEach(function (s) { var e = document.getElementById(s[0]); if (e && e.getBoundingClientRect().top <= y) k = s[1]; });

@@ -344,7 +344,7 @@
     if (sent) {
       var m = document.getElementById('m');
       if (m) m.value = (m.value ? m.value + '\n' : '') + 'Plan changes to ' + fig.name + ': ' + changes.map(function (c) { return c.n + ') ' + c.sel.label + ': ' + c.t; }).join('; ');
-      var ct = document.getElementById('contact'); if (ct) ct.scrollIntoView({ behavior: 'smooth' });
+      location.hash = '#contact';
       return;
     }
     apply.disabled = true;

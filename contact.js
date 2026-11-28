@@ -104,5 +104,6 @@
 
   fetch('assets/plan/house3d.json').then(function (r) { return r.json(); }).then(function (j) { M = j; build(j); layout(); start(); if (RM) { vis = true; frame(performance.now()); vis = false; } }).catch(function () {});
   new IntersectionObserver(function (es) { vis = es[0].isIntersecting; if (vis) start(); }, { threshold: 0 }).observe(sec);
-  addEventListener('resize', function () { if (M) { layout(); if (RM) { vis = true; frame(performance.now()); vis = false; } } });
+  function relayout() { if (M && cv.clientWidth) { layout(); if (RM) { vis = true; frame(performance.now()); vis = false; } else start(); } }
+  if (window.ResizeObserver) new ResizeObserver(relayout).observe(cv); else addEventListener('resize', relayout);
 })();
