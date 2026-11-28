@@ -105,8 +105,9 @@
   }
   function renderDets() {
     var g = $('#m2Dets', svg); if (!g) return;
-    g.innerHTML = dets.map(function (d, i) { var b = d.b; return '<rect class="det" data-c="' + d.cls.replace(/\s/g, '') + '" data-i="' + i + '" x="' + b[0] + '" y="' + b[1] + '" width="' + (b[2] - b[0]) + '" height="' + (b[3] - b[1]) + '" rx="3"/>'; }).join('');
+    g.innerHTML = dets.map(function (d, i) { var b = d.b; return '<rect class="det" data-c="' + d.cls.replace(/\s/g, '') + '" data-i="' + i + '" x="' + b[0] + '" y="' + b[1] + '" width="' + (b[2] - b[0]) + '" height="' + (b[3] - b[1]) + '" rx="3"' + (d.conf < LOW ? ' stroke-dasharray="7 5"' : '') + '><title>' + d.cls + ', ' + Math.round(d.conf * 100) + '% sure' + (d.conf < LOW ? ' (worth checking)' : '') + '</title></rect>'; }).join('');   // dashed = the model is less sure
   }
+  var LOW = 0.6;
   function elsIn(x0, y0, x1, y1) {
     return dets.filter(function (d) {
       var b = { x0: d.b[0], y0: d.b[1], x1: d.b[2], y1: d.b[3] }, a = (b.x1 - b.x0) * (b.y1 - b.y0) || 1, mx = (b.x0 + b.x1) / 2, my = (b.y0 + b.y1) / 2;
@@ -214,7 +215,7 @@
     drawRoomMarks(); renderRooms(); clearSel();
     fx(function () { G.from('#m2Svg .rm, #m2Svg .rl', { opacity: 0, duration: .6, stagger: .03, ease: 'power2.out' }); });
     note.textContent = modelDets
-      ? 'Found ' + rooms.length + ' room' + (rooms.length > 1 ? 's' : '') + (dets.length ? ' · ' + summ(dets) : '') + '. Tap a room on the right, or drag over any area. Open areas can still merge into one room.'
+      ? 'Found ' + rooms.length + ' room' + (rooms.length > 1 ? 's' : '') + (dets.length ? ' · ' + summ(dets) : '') + '. Tap a room on the right, or drag over any area. Open areas can still merge into one room.' + (dets.filter(function (d) { return d.conf < LOW; }).length ? ' ' + dets.filter(function (d) { return d.conf < LOW; }).length + ' parts the model was less sure about are dashed under "Show what we detected": worth a look.' : '')
       : 'We found ' + rooms.length + ' enclosed room' + (rooms.length > 1 ? 's' : '') + ' using a simpler method' + (fellBack ? ' (the detection model could not load here)' : '') + '. Open areas and glass walls can be missed, so you can also drag over any part of the plan.';
   }
   function renderRooms() {
