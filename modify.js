@@ -205,7 +205,7 @@
     var ft = modelDets ? scaleFromDoors(modelDets) : 0, stairs = modelDets ? modelDets.filter(function (d) { return d.cls === 'Stair Case'; }) : [], k = 0, ns = 0;
     mine.pxFtX = mine.pxFtY = ft || undefined;
     mine.rooms = rooms = res.rooms.map(function (r) {
-      var room = { n: '', b: r.b, rects: r.rects, d: ft ? [(r.b[2] - r.b[0]) / ft, (r.b[3] - r.b[1]) / ft] : null, ft: ft || 0, est: !!ft, auto: true };
+      var room = { n: '', b: r.b, rects: r.rects, d: ft ? [(r.b[2] - r.b[0]) / ft, (r.b[3] - r.b[1]) / ft] : null, ft: ft || 0, fx: ft || 0, fy: ft || 0, est: !!ft, auto: true };
       var isStairs = stairs.some(function (sd) {                            // only when the stair is most of the room: a living room that merely has a staircase in it stays a room
         return rin(room, (sd.box[0] + sd.box[2]) / 2, (sd.box[1] + sd.box[3]) / 2) && (sd.box[2] - sd.box[0]) * (sd.box[3] - sd.box[1]) >= rarea(room) * .35;
       });
@@ -214,9 +214,33 @@
     });
     drawRoomMarks(); renderRooms(); clearSel();
     fx(function () { G.from('#m2Svg .rm, #m2Svg .rl', { opacity: 0, duration: .6, stagger: .03, ease: 'power2.out' }); });
+    readTextLater = function () { readText(imgEl, mine); };
     note.textContent = modelDets
       ? 'Found ' + rooms.length + ' room' + (rooms.length > 1 ? 's' : '') + (dets.length ? ' · ' + summ(dets) : '') + '. Tap a room on the right, or drag over any area. Open areas can still merge into one room.' + (dets.filter(function (d) { return d.conf < LOW; }).length ? ' ' + dets.filter(function (d) { return d.conf < LOW; }).length + ' parts the model was less sure about are dashed under "Show what we detected": worth a look.' : '')
       : 'We found ' + rooms.length + ' enclosed room' + (rooms.length > 1 ? 's' : '') + ' using a simpler method' + (fellBack ? ' (the detection model could not load here)' : '') + '. Open areas and glass walls can be missed, so you can also drag over any part of the plan.';
+    readTextLater();
+  }
+  var readTextLater = function () {};
+  function readText(imgEl, mine) {                                         // read the room names and sizes printed on the plan; the rooms above stay if this finds nothing
+    if (!window.UBCPlanOCR || !rooms.length) return;
+    var base = note.textContent;
+    note.textContent = 'Reading the text on your plan…';
+    window.UBCPlanOCR.read(imgEl).then(function (words) {
+      if (fig !== mine) return;
+      var labels = window.UBCPlanOCR.label(words, rooms, rin), sc = window.UBCPlanOCR.scale(rooms, labels), named = 0, sized = 0, k = 0;
+      if (sc && mine.pxFtX && (sc.fx / mine.pxFtX < .5 || sc.fx / mine.pxFtX > 2)) sc = null;   // disagrees wildly with the door estimate: do not trust it
+      if (sc) { mine.pxFtX = sc.fx; mine.pxFtY = sc.fy; }
+      rooms.forEach(function (r, i) {
+        var l = labels[i];
+        if (l && l.name && !/^Stairs/.test(r.n)) { r.n = l.name; named++; } else if (/^Room /.test(r.n)) r.n = 'Room ' + (++k);
+        if (sc) {
+          r.fx = sc.fx; r.fy = sc.fy; r.ft = (sc.fx + sc.fy) / 2; r.d = [(r.b[2] - r.b[0]) / sc.fx, (r.b[3] - r.b[1]) / sc.fy]; r.est = true; r.print = '';
+          if (l && l.dim && l.print) { r.print = l.print; sized++; }
+        }
+      });
+      renderRooms(); clearSel();
+      note.textContent = base.replace(/^(Found|We found) \d+ (enclosed )?rooms?/, function (m) { return m; }) + (named ? ' Read ' + named + ' room name' + (named > 1 ? 's' : '') + (sized ? ' and ' + sized + ' printed size' + (sized > 1 ? 's' : '') : '') + (sc ? ' from the text on your plan, and used them to set the scale.' : ' from the text on your plan.') : ' No room names were printed on this drawing, so rooms are numbered.');
+    }).catch(function () { if (fig === mine) note.textContent = base; });
   }
   function renderRooms() {
     $('#m2RL').hidden = !rooms.length;
@@ -282,8 +306,9 @@
   }
   function sizeTxt(r) {                                                     // estimated size from the plan's door-size scale
     if (!r.d || !r.ft) return '';
+    if (r.print) return r.print;                                            // the size printed on the drawing itself
     var b = R(r), fill = rarea(r) / Math.max(1, (b.x1 - b.x0) * (b.y1 - b.y0));
-    return fill < .85 ? '≈ ' + Math.round(rarea(r) / (r.ft * r.ft)) + ' sq ft' : '≈ ' + Math.round(r.d[0]) + ' × ' + Math.round(r.d[1]) + ' ft';
+    return fill < .85 ? '≈ ' + Math.round(rarea(r) / ((r.fx || r.ft) * (r.fy || r.ft))) + ' sq ft' : '≈ ' + Math.round(r.d[0]) + ' × ' + Math.round(r.d[1]) + ' ft';
   }
   function roomAt(x, y) {
     var best = null, ba = 1e12;                                   // smallest room under the point wins (closets inside rooms)
