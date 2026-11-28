@@ -947,10 +947,10 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
 <body>
 <nav id="siteNav">
   <a class="nlogo" href="#top" aria-label="Home Plans for Steel, home"><img src="assets/brand/ubc-mark.webp" alt="UBC"></a>
-  <div class="nl" id="nl" role="navigation" aria-label="Main"><span class="nind" aria-hidden="true"></span><a href="#top" data-k="home">Home</a><a href="#shop" data-k="shop">Shop BIM Models</a><a href="#story" data-k="how">How It Works</a><a href="#about" data-k="about">About Us</a><a href="#contact" data-k="contact">Contact Us</a><button type="button" class="nacct" id="acctBtn" data-k="acct" aria-haspopup="dialog">My account</button></div>
+  <div class="nl" id="nl" role="navigation" aria-label="Main"><span class="nind" aria-hidden="true"></span><a href="#top" data-k="home">Home</a><a href="#shop" data-k="shop">Shop BIM Models</a><a href="#modify" data-k="modify">Modify a plan</a><a href="#bring" data-k="bring">Upload yours</a><a href="#about" data-k="about">About Us</a><a href="#contact" data-k="contact">Contact Us</a><button type="button" class="nacct" id="acctBtn" data-k="acct" aria-haspopup="dialog">My account</button></div>
   <div class="nr"><a class="npill" href="mailto:marketing@homeplansforsteel.com?subject=Custom%20plan%20request">Request a custom plan</a></div>
   <button class="nmenu" id="nmenu" type="button" aria-label="Menu" aria-expanded="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8h16M4 16h16"/></svg></button>
-  <div class="npanel" id="npanel"><a href="#top">Home</a><a href="#shop">Shop BIM Models</a><a href="#story">How It Works</a><a href="#about">About Us</a><a href="#contact">Contact Us</a><button type="button" class="nacct" data-open-account>My account</button><a class="npanel-cta" href="mailto:marketing@homeplansforsteel.com?subject=Custom%20plan%20request">Request a custom plan</a></div>
+  <div class="npanel" id="npanel"><a href="#top">Home</a><a href="#shop">Shop BIM Models</a><a href="#modify">Modify a plan</a><a href="#bring">Upload yours</a><a href="#about">About Us</a><a href="#contact">Contact Us</a><button type="button" class="nacct" data-open-account>My account</button><a class="npanel-cta" href="mailto:marketing@homeplansforsteel.com?subject=Custom%20plan%20request">Request a custom plan</a></div>
 </nav>
 <div class="acct" id="acct" role="dialog" aria-modal="true" aria-labelledby="acctT" hidden>
   <div class="acct-card"><button type="button" class="acct-x" id="acctX" aria-label="Close">&times;</button>
@@ -1053,7 +1053,30 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
   </div>
   <p class="about-addr">UBC Technology Services Inc &middot; 885 Gold Hill Rd #3083, Fort Mill, SC 29708</p>
 </section>
-<footer class="hf" id="foot"><span id="contact"></span>
+<section class="contact" id="contact" aria-labelledby="cT">
+  <canvas class="cg-cv" id="cgCv" role="img" aria-label="A 3D model of a house made of softly glittering white dots"></canvas>
+  <div class="cg-in">
+    <form class="cg-form" id="cgForm" novalidate>
+      <h2 id="cT">Contact us</h2>
+      <p class="cg-sub">Tell us about your project. A person replies by email.</p>
+      <div class="cg-row">
+        <div class="cg-f"><label for="cgName">Name</label><input id="cgName" name="name" type="text" placeholder="Name" autocomplete="name" required></div>
+        <div class="cg-f"><label for="cgPhone">Phone</label><input id="cgPhone" name="phone" type="tel" placeholder="Phone" autocomplete="tel"></div>
+      </div>
+      <div class="cg-f"><label for="cgEmail">Email</label><input id="cgEmail" name="email" type="email" placeholder="Email" autocomplete="email" required></div>
+      <div class="cg-row">
+        <div class="cg-f"><label for="cgRole">I'm a</label><select id="cgRole" name="role"><option>Architect</option><option>Builder or contractor</option><option>Homeowner</option><option>Developer</option><option>Other</option></select></div>
+        <div class="cg-f"><label for="cgType">Project type</label><select id="cgType" name="type"><option>Single family</option><option>Multi-family</option><option>ADU or tiny home</option><option>Garage or pod</option><option>Commercial</option></select></div>
+      </div>
+      <div class="cg-f"><label for="cgLoc">Location</label><input id="cgLoc" name="location" type="text" placeholder="City / site location" autocomplete="address-level2"></div>
+      <div class="cg-f"><label for="m">Message</label><textarea id="m" name="message" rows="4" placeholder="Message" required></textarea></div>
+      <p class="cg-err" id="cgErr" role="alert" hidden></p>
+      <button class="btn" type="submit">Send request</button>
+      <p class="cg-note" id="cgNote">Sending opens your email app with this message ready to go.</p>
+    </form>
+  </div>
+</section>
+<footer class="hf" id="foot">
   <div class="hf-3d" id="p2m">
     <div class="hf-3d-head"><span class="tag"><b>UPLOAD</b>Plan in, model out</span><h2>Upload a plan. We build the 3D model.</h2><p>Rooms, walls and openings are read from your drawing and rebuilt as a model you can walk around.</p><a class="hf-cta" href="mailto:marketing@homeplansforsteel.com?subject=Custom%20plan%20request">Request a custom plan <span aria-hidden="true">&rarr;</span></a></div>
     <div class="p2m-stage" id="p2mStage"><canvas id="p2mCv" role="img" aria-label="A floor plan dissolving into white dots that reassemble as a 3D house"></canvas></div>
@@ -1394,6 +1417,7 @@ new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){start();i
 <link rel="stylesheet" href="clean.css">
 <link rel="stylesheet" href="design.css">
 <link rel="stylesheet" href="nav.css">
+<link rel="stylesheet" href="contact.css">
 <script src="animations.js"></script>
 <script>/* Address of the hosted plan-reading service (see server/). Leave empty to switch automatic reading of uploaded plans off. */
 window.UBC_DETECT_URL=window.UBC_DETECT_URL||"";</script>
@@ -1402,5 +1426,6 @@ window.UBC_DETECT_URL=window.UBC_DETECT_URL||"";</script>
 <script src="menu.js"></script>
 <script src="touch.js"></script>
 <script src="nav.js"></script>
+<script src="contact.js"></script>
 </body>
 </html>
