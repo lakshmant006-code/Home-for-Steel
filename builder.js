@@ -100,6 +100,45 @@
     return best;
   }
 
+  /* ---------- motion: rooms glide to where they snap, and press into place when they stick ---------- */
+  var seams = document.createElementNS(NS, 'g'); seams.setAttribute('pointer-events', 'none'); svg.appendChild(seams);
+  var gliding = false;
+  function glide(r) {                                                        // ease the drawn room toward its snapped position
+    var e = els[r.id]; if (!e) return;
+    if (RM || !G) { e.v.x = r.x; e.v.y = r.y; paint(r, r); return; }
+    if (gliding) return; gliding = true;
+    (function step() {
+      var busy = false;
+      rooms.forEach(function (q) {
+        var x = els[q.id]; if (!x) return;
+        var dx = q.x - x.v.x, dy = q.y - x.v.y;
+        if (Math.abs(dx) < .02 && Math.abs(dy) < .02) { if (dx || dy) { x.v.x = q.x; x.v.y = q.y; paint(q, { x: q.x, y: q.y, w: q.w, d: q.d }); } return; }
+        x.v.x += dx * .3; x.v.y += dy * .3; busy = true; paint(q, { x: x.v.x, y: x.v.y, w: q.w, d: q.d });
+      });
+      if (busy) requestAnimationFrame(step); else gliding = false;
+    })();
+  }
+  function seamsOf(r) {                                                      // the edges this room now shares with its neighbours
+    var out = [];
+    rooms.forEach(function (o) {
+      if (o.id === r.id) return;
+      var oy0 = Math.max(r.y, o.y), oy1 = Math.min(r.y + r.d, o.y + o.d), ox0 = Math.max(r.x, o.x), ox1 = Math.min(r.x + r.w, o.x + o.w);
+      if (oy1 - oy0 > .01) { if (Math.abs(r.x + r.w - o.x) < .01) out.push([o.x, oy0, o.x, oy1]); if (Math.abs(o.x + o.w - r.x) < .01) out.push([r.x, oy0, r.x, oy1]); }
+      if (ox1 - ox0 > .01) { if (Math.abs(r.y + r.d - o.y) < .01) out.push([ox0, o.y, ox1, o.y]); if (Math.abs(o.y + o.d - r.y) < .01) out.push([ox0, r.y, ox1, r.y]); }
+    });
+    return out;
+  }
+  function stick(r) {                                                        // press the room in, and flash the joint
+    var e = els[r.id], sm = seamsOf(r); if (!e || !sm.length || RM || !G) return;
+    G.killTweensOf(e); e.s = 1.035;
+    G.to(e, { s: 1, duration: .5, ease: 'elastic.out(1.1,.45)', onUpdate: function () { paint(r, { x: e.v.x, y: e.v.y, w: r.w, d: r.d }); }, onComplete: function () { paint(r, { x: r.x, y: r.y, w: r.w, d: r.d }); } });
+    sm.forEach(function (s) {
+      var l = document.createElementNS(NS, 'line'); l.setAttribute('class', 'bm-seam');
+      l.setAttribute('x1', s[0]); l.setAttribute('y1', s[1]); l.setAttribute('x2', s[2]); l.setAttribute('y2', s[3]); seams.appendChild(l);
+      G.fromTo(l, { opacity: 1, strokeWidth: 7 }, { opacity: 0, strokeWidth: 2, duration: .6, ease: 'power2.out', onComplete: function () { if (l.parentNode) l.parentNode.removeChild(l); } });
+    });
+  }
+
   /* ---------- drawing a room ---------- */
   function mk(r) {
     var g = document.createElementNS(NS, 'g');
@@ -109,10 +148,11 @@
     var h = document.createElement('div');
     h.className = 'bm-hit'; h.tabIndex = 0; h.setAttribute('role', 'button'); h.setAttribute('data-id', r.id);
     stage.appendChild(h);
-    els[r.id] = { h: h, g: g, r: g.querySelector('.bm-r'), n: g.querySelector('.bm-n'), d: g.querySelector('.bm-d'), t: g.querySelector('title'), m: [].slice.call(g.querySelectorAll('.bm-m rect')) };
+    els[r.id] = { s: 1, v: { x: r.x, y: r.y }, h: h, g: g, r: g.querySelector('.bm-r'), n: g.querySelector('.bm-n'), d: g.querySelector('.bm-d'), t: g.querySelector('title'), m: [].slice.call(g.querySelectorAll('.bm-m rect')) };
   }
   function paint(r, o) {                                                     // o: optional in-between geometry while a resize animates
     var e = els[r.id]; if (!e) return; o = o || r;
+    if (e.s && e.s !== 1) o = { x: o.x - (o.w * e.s - o.w) / 2, y: o.y - (o.d * e.s - o.d) / 2, w: o.w * e.s, d: o.d * e.s };   // a small squash while a room sticks
     e.g.setAttribute('transform', 'translate(' + o.x + ' ' + o.y + ')');
     e.h.style.left = (o.x / CW * 100) + '%'; e.h.style.top = (o.y / CH * 100) + '%'; e.h.style.width = (o.w / CW * 100) + '%'; e.h.style.height = (o.d / CH * 100) + '%';
     e.r.setAttribute('width', o.w); e.r.setAttribute('height', o.d); e.r.style.fill = r.c;
@@ -154,7 +194,7 @@
     if (!spot) { msg('No space left on the canvas. Remove or shrink a room first.'); return null; }
     var r = { id: nextId++, k: k, n: uniqueName(t), c: t.c, x: spot.x, y: spot.y, w: t.w, d: t.d };
     rooms.push(r); mk(r); paint(r); select(r.id); totals();
-    if (G && !RM) G.from(els[r.id].g, { opacity: 0, duration: .35, ease: 'power2.out' });
+    if (G && !RM) { G.from(els[r.id].g, { opacity: 0, duration: .35, ease: 'power2.out' }); setTimeout(function () { stick(r); }, 120); }
     return r;
   }
   function removeRoom(id) {
@@ -210,7 +250,7 @@
     if (e.button > 0) return;
     var id = +g.getAttribute('data-id'), r = get(id); if (!r) return;
     select(id);
-    var p = pt(e); drag = { id: id, ox: p.x - r.x, oy: p.y - r.y, sx: r.x, sy: r.y, moved: false, g: g };
+    var p = pt(e); els[id].g.classList.add('lift'); drag = { touch: contact(r, id) > 0, id: id, ox: p.x - r.x, oy: p.y - r.y, sx: r.x, sy: r.y, moved: false, g: g };
     try { g.setPointerCapture(e.pointerId); } catch (x) {}
     e.preventDefault();
   });
@@ -219,15 +259,16 @@
     var r = get(drag.id); if (!r) return;
     var p = pt(e), s = snapPos({ x: p.x - drag.ox, y: p.y - drag.oy, w: r.w, d: r.d }, r.id);
     if (Math.abs(s.x - r.x) > 0 || Math.abs(s.y - r.y) > 0) drag.moved = true;
-    r.x = s.x; r.y = s.y; paint(r);
+    var had = drag.touch; r.x = s.x; r.y = s.y; glide(r);
+    var now = free(r, r.id) && contact(r, r.id) > 0; if (now && !had) stick(r); drag.touch = now;
     els[r.id].g.classList.toggle('bad', !free(r, r.id));
   });
   function endDrag() {
     if (!drag) return;
     var r = get(drag.id);
     if (r) {
-      els[r.id].g.classList.remove('bad');
-      if (!free(r, r.id)) { r.x = drag.sx; r.y = drag.sy; paint(r); msg('Rooms cannot overlap. Drag it next to the other room instead.'); }
+      els[r.id].g.classList.remove('bad'); els[r.id].g.classList.remove('lift');
+      if (!free(r, r.id)) { r.x = drag.sx; r.y = drag.sy; glide(r); msg('Rooms cannot overlap. Drag it next to the other room instead.'); }
     }
     drag = null;
   }
