@@ -1,0 +1,9 @@
+/* Super clean: the small "eyebrow" labels above headings and cards are hidden everywhere.
+   (Delete a selector from this list to bring that label back.) */
+.sh-bar,                      /* "00 ◇ HOW IT WORKS  SHEET A-01" strips above every section and page */
+.tag,                         /* "OPEN  Straight from us to you", "UPLOAD  Plan in, model out" */
+.fig,                         /* "FIG. 01", "FIG. 02", "FIG. 04" and the 01/02/03 card numbers */
+.st .num, .capi .num,         /* step numbers above the story titles */
+.pdetail .mono,               /* "SINGLE" above a plan's name */
+.hf-h                         /* VISIT / TALK TO US / EXPLORE above the footer columns */
+{display:none!important}
