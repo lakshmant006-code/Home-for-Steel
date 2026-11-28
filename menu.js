@@ -16,5 +16,5 @@
   document.addEventListener('click', function (e) { if (!nav.contains(e.target)) setOpen(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
   addEventListener('hashchange', function () { setOpen(false); });
-  addEventListener('resize', function () { if (innerWidth > 900) setOpen(false); });
+  addEventListener('resize', function () { if (innerWidth > 1240) setOpen(false); });
 })();
