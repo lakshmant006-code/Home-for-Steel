@@ -46,3 +46,14 @@
   nav .nr .npill{margin-left:0;padding:9px 13px;font-size:13px}
   .npanel{z-index:60}
 }
+
+/* ---- story cards are screen recordings now: the card takes the videos' wide shape so nothing is cropped ---- */
+html .sg-r .card{aspect-ratio:2598/1080!important;width:min(94%,760px)!important;height:auto!important;background:#fff}
+html .sg-r .fg{padding:0!important;object-fit:contain;background:#fff;display:block}
+@media(max-width:860px){
+  html .sg-r{height:auto!important;min-height:0!important;display:block!important}
+  html .sg-r .card{position:relative!important;width:min(92%,420px)!important;margin:18px auto!important}
+  /* caption sits directly under the card instead of at the bottom of the screen */
+  html .sg-cap{order:-1;position:sticky;top:calc(64px + 36px + min(92vw,420px) * .4156);bottom:auto;height:176px;min-height:0;margin-bottom:-176px;overflow:hidden;z-index:4;background:#fff;border-top:1px solid var(--rule)}
+  html .sg-l>.st:first-child{margin-top:0}
+}
