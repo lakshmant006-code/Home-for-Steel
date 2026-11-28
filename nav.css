@@ -90,3 +90,40 @@ html nav#siteNav .nmenu,html nav#siteNav .npanel{display:none}
 /* while the phone menu is open the bar is solid, so nothing shows through behind the logo */
 html nav#siteNav.open{background:#fff!important;border-bottom-color:var(--rule)!important}
 @media(max-width:1100px){html nav#siteNav .npanel{background:#fff}}
+
+/* ==========================================================================
+   Buttons: the original look. Rectangular, near-black, no rounding. (Loaded last on purpose.)
+   Primary  = black fill, white text.   Secondary = white fill, black outline.
+   ========================================================================== */
+:root{--btn-black:#0B0C0E;--btn-black-hover:#262A30}
+
+html .btn,html .btn.dark,html .sk-go.pri,html .skb.red,html button.skb.red,
+html nav#siteNav .npill,html nav#siteNav .npanel>.npanel-cta{
+  background:var(--btn-black)!important;color:#fff!important;border:1px solid var(--btn-black)!important;border-radius:0!important;box-shadow:none!important}
+html .btn:hover,html .btn.dark:hover,html .sk-go.pri:hover,html .skb.red:hover,
+html nav#siteNav .npill:hover,html nav#siteNav .npanel>.npanel-cta:hover{background:var(--btn-black-hover)!important;border-color:var(--btn-black-hover)!important;box-shadow:none!important}
+
+html .skb,html .sk-go,html .hero .ghost,html .m2-own .skb,html button.skb,html label.skb{
+  background:#fff;color:var(--btn-black);border:1px solid var(--btn-black);border-radius:0!important;box-shadow:none}
+html .skb:hover,html .sk-go:hover,html .hero .ghost:hover,html .m2-own .skb:hover{background:#fff;border-color:var(--btn-black);box-shadow:inset 0 0 0 1px var(--btn-black)}
+
+html nav#siteNav .npill{height:auto;min-height:43px;padding:9px 16px;font:500 .90625rem/1.2 var(--font-text,Inter,sans-serif)!important}
+html .btn,html .skb,html .sk-go{min-height:44px;padding:10px 20px}
+
+/* square everywhere a control is round */
+html nav#siteNav .nmenu,html .nmenu,html .hero .snd,html .acct-x,html nav#siteNav .nind,html nav#siteNav .nl>a,html nav#siteNav .nl>.nacct{border-radius:0!important}
+html .hero .snd{background:#fff;border:1px solid var(--btn-black)}
+html .acct-card{border-radius:0}
+
+/* editor chips and room buttons */
+html .chips2 button,html .m2-chips button,html .m2-rooms button{border-radius:0!important}
+html .m2-chips button,html .m2-rooms button{background:#fff;color:var(--btn-black);border:1px solid var(--rule-strong)}
+html .m2-chips button:hover:not(:disabled),html .m2-rooms button:hover{background:#fff;border-color:var(--btn-black);color:var(--btn-black)}
+html .m2-chips button:disabled{background:#fff;color:var(--mute);border-color:var(--rule);opacity:.55}
+
+/* footer request button: still white on black, now rectangular like every other button */
+html footer.hf a.hf-cta,html footer.hf a.hf-cta:hover{border-radius:0!important;background:#fff!important;color:#000!important}
+html footer.hf a.hf-cta:hover{background:#e9e9e9!important}
+
+/* text fields match the square buttons beside them */
+html input[type=text],html input[type=email],html input[type=tel],html input[type=search],html textarea,html select,html .m2-ask input{border-radius:0}
