@@ -83,3 +83,8 @@
 #m2Svg .det[data-c="Column"],#m2Svg .det[data-c="StairCase"],#m2Svg .det[data-c="Railing"]{stroke:#6d4cff;fill:rgba(109,76,255,.14)}
 #m2Svg.show-dets .det{opacity:.55}
 #m2Svg .det.on{opacity:1}
+
+/* rooms found by the in-browser plan reader */
+#m2Svg .rl circle{fill:#6d4cff;stroke:#fff;stroke-width:2.5}
+#m2Svg .rl text{fill:#fff;font-family:Inter,sans-serif;font-weight:600;pointer-events:none}
+#m2Svg rect.rm.peek{fill:rgba(109,76,255,.16);stroke:#6d4cff;stroke-width:3}

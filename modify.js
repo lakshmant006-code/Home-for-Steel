@@ -142,18 +142,55 @@
       return hz ? (my > E.y0 + 36 && my < E.y1 - 36) : (mx > E.x0 + 36 && mx < E.x1 - 36);
     });
   }
+
+  /* ---------- read an uploaded plan in the browser: find the rooms and list them on the right ---------- */
+  function drawRoomMarks() {
+    $$('.rm, .rl', svg).forEach(function (e) { e.parentNode.removeChild(e); });
+    var before = $('#m2Dets', svg), frag = document.createDocumentFragment();
+    rooms.forEach(function (r, i) {
+      var b = R(r), rect = document.createElementNS(NS, 'rect');
+      rect.setAttribute('class', 'rm'); rect.setAttribute('data-i', i); rect.setAttribute('x', b.x0); rect.setAttribute('y', b.y0); rect.setAttribute('width', b.x1 - b.x0); rect.setAttribute('height', b.y1 - b.y0);
+      frag.appendChild(rect);
+      if (r.auto) {                                                         // a numbered badge so each chip on the right matches a room on the plan
+        var g = document.createElementNS(NS, 'g'), rad = Math.max(12, Math.min(22, fig.W / 60));
+        g.setAttribute('class', 'rl'); g.innerHTML = '<circle cx="' + (b.x0 + rad + 4) + '" cy="' + (b.y0 + rad + 4) + '" r="' + rad + '"/><text x="' + (b.x0 + rad + 4) + '" y="' + (b.y0 + rad + 4 + rad * .36) + '" text-anchor="middle" style="font-size:' + (rad * 1.05) + 'px">' + (i + 1) + '</text>';
+        frag.appendChild(g);
+      }
+    });
+    svg.insertBefore(frag, before);
+  }
+  function readRooms(imgEl, mine) {
+    if (fig !== mine) return;                                               // the visitor switched plans while it was reading
+    var res = null;
+    try { res = window.UBCReadPlan ? window.UBCReadPlan(imgEl) : null; } catch (e) { res = null; }
+    if (fig !== mine) return;
+    if (!res || !res.rooms.length) {
+      note.textContent = 'We could not find clear rooms on this drawing, so drag over any part of it and describe the change.';
+      return;
+    }
+    mine.rooms = rooms = res.rooms.map(function (r, i) { return { n: 'Room ' + (i + 1), b: r.b, d: null, auto: true }; });
+    drawRoomMarks(); renderRooms(); clearSel();
+    fx(function () { G.from('#m2Svg .rm, #m2Svg .rl', { opacity: 0, duration: .6, stagger: .03, ease: 'power2.out' }); });
+    note.textContent = 'We found ' + rooms.length + ' enclosed room' + (rooms.length > 1 ? 's' : '') + ' and listed ' + (rooms.length > 1 ? 'them' : 'it') + ' on the right. Open areas and glass walls can be missed, so you can also drag over any part of the plan.';
+  }
   function renderRooms() {
     $('#m2RL').hidden = !rooms.length;
     $('#m2Rooms').innerHTML = rooms.map(function (r, i) { return '<button type="button" data-i="' + i + '">' + esc(r.n) + '</button>'; }).join('');
     fx(function () { G.from('#m2Rooms button', { y: 10, opacity: 0, duration: 0.45, stagger: 0.025, ease: 'power3.out', delay: 0.5 }); });
   }
+  $('#m2Rooms').addEventListener('mouseover', function (e) { var b = e.target.closest('button'); $$('.rm', svg).forEach(function (g) { g.classList.toggle('peek', !!b && g.dataset.i === b.dataset.i); }); });
+  $('#m2Rooms').addEventListener('mouseleave', function () { $$('.rm', svg).forEach(function (g) { g.classList.remove('peek'); }); });
   $('#m2Rooms').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { var r = R(rooms[+b.dataset.i]); select(r.x0, r.y0, r.x1, r.y1); } });
   $('#m2File').addEventListener('change', function () {
     var f = this.files[0]; if (!f) return;
     if (objUrl) URL.revokeObjectURL(objUrl);
     objUrl = URL.createObjectURL(f);
     var t = new Image();
-    t.onload = function () { load({ src: objUrl, W: t.naturalWidth, H: t.naturalHeight, name: f.name, rooms: [], file: f }); };
+    t.onload = function () {
+      load({ src: objUrl, W: t.naturalWidth, H: t.naturalHeight, name: f.name, rooms: [], file: f });
+      var mine = fig; note.textContent = 'Reading your plan…';
+      setTimeout(function () { readRooms(t, mine); }, 80);                 // let the plan appear first, then find the rooms
+    };
     t.onerror = function () { note.textContent = 'That file could not be read as an image. Try a PNG or JPG of your plan.'; };
     t.src = objUrl;
   });
@@ -203,8 +240,9 @@
     if (x1 - x0 < 14 || y1 - y0 < 14) { clearSel(); return; }
     var hs = hits(x0, y0, x1, y1), label, dim;
     label = hs.length === 1 ? hs[0].n : hs.length > 1 ? hs.length + ' rooms' : (fig === STD ? 'Open area' : 'Selected area');
-    if (hs.length === 1) dim = fmt(hs[0].d[0]) + ' × ' + fmt(hs[0].d[1]);
-    else if (fig === STD) dim = '≈ ' + Math.round((x1 - x0) / fig.pxFtX) + "' × " + Math.round((y1 - y0) / fig.pxFtY) + "'";
+    if (hs.length === 1 && hs[0].d) dim = fmt(hs[0].d[0]) + ' × ' + fmt(hs[0].d[1]);
+    else if (hs.length === 1) dim = '';
+    else if (fig === STD && hs.length !== 1) dim = '≈ ' + Math.round((x1 - x0) / fig.pxFtX) + "' × " + Math.round((y1 - y0) / fig.pxFtY) + "'";
     else dim = '';
     sel = { x0: x0, y0: y0, x1: x1, y1: y1, rooms: hs, label: label, dim: dim, els: elsIn(x0, y0, x1, y1) };
     var found = summ(sel.els);
