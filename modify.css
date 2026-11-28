@@ -74,3 +74,12 @@
 #m2Svg .glow{filter:drop-shadow(0 0 6px rgba(109,76,255,.9))}
 .m2-list li em{display:block;font-style:normal;font-size:12.5px;color:#4a2fc4;margin-top:2px}.m2-list li em:empty{display:none}
 #m2Svg{position:absolute;inset:0;width:100%;height:100%;max-height:none;display:block;overflow:visible}
+
+/* ---- parts found by the plan-detection model ---- */
+#m2Svg .det{fill:none;stroke-width:3;opacity:0;transition:opacity .35s;pointer-events:none}
+#m2Svg .det[data-c="Door"],#m2Svg .det[data-c="SlidingDoor"]{stroke:#0aa89a;fill:rgba(10,168,154,.16)}
+#m2Svg .det[data-c="Window"]{stroke:#1f9d62;fill:rgba(31,157,98,.2)}
+#m2Svg .det[data-c="Wall"],#m2Svg .det[data-c="CurtainWall"]{stroke:#d28b00;fill:rgba(210,139,0,.14)}
+#m2Svg .det[data-c="Column"],#m2Svg .det[data-c="StairCase"],#m2Svg .det[data-c="Railing"]{stroke:#6d4cff;fill:rgba(109,76,255,.14)}
+#m2Svg.show-dets .det{opacity:.55}
+#m2Svg .det.on{opacity:1}

@@ -943,7 +943,6 @@ img,svg,canvas,video{-webkit-user-drag:none;user-drag:none}
 .hero,.hero *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='26' viewBox='0 0 22 26'%3E%3Cpath d='M3 2v19l5-4.6 3.4 7.6 3.2-1.5-3.3-7.4 6.7-.2z' fill='%23000' stroke='%23fff' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E") 3 2,default}
 .hero button,.hero a{cursor:pointer}
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 <nav>
@@ -1066,7 +1065,12 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
 /* ---------- plan flow: transparent pricing, closest-plan search, markup & redraw ---------- */
 (function(){
   var PL=[
-   {id:'r1',n:'Ranch 2520 with garage',t:'single',sf:2520,bd:3,ba:2,pr:1690,img:'single',plan:'assets/plans/ranch-2520.webp',rooms:[[0,0,59,52]]}];
+   {id:'r1',n:'Ranch 2520 with garage',t:'single',sf:2520,bd:3,ba:2,pr:1690,img:'single',plan:'assets/plans/ranch-2520.webp',mod:true,rooms:[[0,0,59,52]]},
+   {id:'r2',n:'Courtyard House',t:'single',sf:0,pr:null,img:'single',plan:'assets/plans/courtyard-house.webp',facts:'4 bed · 4 bath · central courtyard · 2-car garage',rooms:[[0,0,1,1]]},
+   {id:'r3',n:'Studio Office',t:'commercial',sf:0,pr:null,img:'single',plan:'assets/plans/studio-office.webp',facts:'4 private offices · open desk area · 3 meeting rooms · reception',rooms:[[0,0,1,1]]},
+   {id:'r4',n:'Terrace Row',t:'multi',sf:0,pr:null,img:'townhomes',plan:'assets/plans/townhouse-row.webp',facts:'3 townhomes · open living and dining · rear terrace each',rooms:[[0,0,1,1]]},
+   {id:'r5',n:'Twin Duplex',t:'multi',sf:0,pr:null,img:'townhomes',plan:'assets/plans/duplex-pair.webp',facts:'2 homes · 2 bed · 1 bath each · front and rear patios',rooms:[[0,0,1,1]]},
+   {id:'r6',n:'Bakery Café',t:'commercial',sf:0,pr:null,img:'single',plan:'assets/plans/bakery-cafe.webp',facts:'Café seating · service counter · bakery kitchen · storage · 2 restrooms',rooms:[[0,0,1,1]]}];
   var NSv='http://www.w3.org/2000/svg';
   function planSvg(p,w){var W=0,H=0;p.rooms.forEach(function(r){W=Math.max(W,r[2]);H=Math.max(H,r[3])});var k=w/ (Math.max(W,H)||1);
     var s='<svg viewBox="-3 -3 '+(W+6)+' '+(H+6)+'" xmlns="'+NSv+'"><rect x="0" y="0" width="'+W+'" height="'+H+'" fill="none" stroke="#13233a" stroke-width="1.1"/>';
@@ -1082,16 +1086,16 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
   new IntersectionObserver(function(es){if(es[0].isIntersecting){[].forEach.call(pb.querySelectorAll('.bar'),function(i,k){setTimeout(function(){i.style.height=i.dataset.h+'%'},k*160)})}},{threshold:.3}).observe(pb)}
   // --- plan grid
   var grid=$('#pgrid'),det=$('#pdetail'),flt='all',ranks=null;
-  function card(p,i){var m=ranks&&ranks[p.id];return '<button type="button" class="pc" data-id="'+p.id+'" style="transition-delay:'+(i*45)+'ms"><div class="pim">'+(m?'<span class="match">'+m+'% match</span>':'')+'<img loading="lazy" alt="'+p.n+'"'+(p.plan?' class="isplan"':'')+' src="'+(p.plan||('assets/types/'+p.img+'.webp'))+'">'+(p.plan?'':planSvg(p,200))+'</div><div class="m"><b>'+p.n+'</b><span class="pr">'+usd(p.pr)+'</span></div><small>'+(p.sf.toLocaleString())+' sq ft'+(p.bd?' · '+p.bd+' bed':'')+(p.ba?' · '+p.ba+' bath':'')+'</small></button>'}
+  function card(p,i){var m=ranks&&ranks[p.id];return '<button type="button" class="pc" data-id="'+p.id+'" style="transition-delay:'+(i*45)+'ms"><div class="pim">'+(m?'<span class="match">'+m+'% match</span>':'')+'<img loading="lazy" alt="'+p.n+'"'+(p.plan?' class="isplan"':'')+' src="'+(p.plan||('assets/types/'+p.img+'.webp'))+'">'+(p.plan?'':planSvg(p,200))+'</div><div class="m"><b>'+p.n+'</b><span class="pr">'+(p.pr?usd(p.pr):'Quote')+'</span></div><small>'+(p.facts||(p.sf.toLocaleString()+' sq ft'+(p.bd?' · '+p.bd+' bed':'')+(p.ba?' · '+p.ba+' bath':'')))+'</small></button>'}
   function draw(){var list=PL.filter(function(p){return flt==='all'||p.t===flt});if(ranks)list=list.slice().sort(function(a,b){return (ranks[b.id]||0)-(ranks[a.id]||0)});
     grid.innerHTML=list.map(card).join('');requestAnimationFrame(function(){[].forEach.call(grid.children,function(c){c.classList.add('in')})})}
   draw();
   $('#fchips').onclick=function(e){var b=e.target.closest('button');if(!b)return;flt=b.dataset.f;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)});draw()};
   grid.addEventListener('click',function(e){var c=e.target.closest('.pc');if(!c)return;var p=PL.filter(function(x){return x.id===c.dataset.id})[0];
-    var ln=BR.map(function(b){return '<li><b>'+b[0]+'</b><span>'+usd(Math.round(p.pr*b[1]))+'</span></li>'}).join('');
-    det.innerHTML='<div class="pv">'+(p.plan?'<img class="isplan" alt="'+p.n+' floor plan" src="'+p.plan+'" style="margin-top:0">':planSvg(p,400)+'<img alt="'+p.n+' elevation" src="assets/types/'+p.img+'.webp">')+'</div><div><div class="mono">'+p.t+'</div><h3>'+p.n+'</h3><div class="big">'+usd(p.pr)+'</div><p class="mut">'+p.sf.toLocaleString()+' sq ft'+(p.bd?' · '+p.bd+' bed':'')+(p.ba?' · '+p.ba+' bath':'')+'. Price includes every file below.</p><ul class="files" style="margin-top:14px">'+ln+'</ul><p class="mut" style="margin-top:12px">All produced in-house by UBC. No contractor, no reseller.</p><div class="btnrow"><a class="btn" href="#contact">Buy this plan</a><a class="skb" href="#modify" style="display:inline-flex;align-items:center">Change it first</a></div></div>';
+    var ln=BR.map(function(b){return '<li><b>'+b[0]+'</b><span>'+(p.pr?usd(Math.round(p.pr*b[1])):'Included')+'</span></li>'}).join('');
+    det.innerHTML='<div class="pv">'+(p.plan?'<img class="isplan" alt="'+p.n+' floor plan" src="'+p.plan+'" style="margin-top:0">':planSvg(p,400)+'<img alt="'+p.n+' elevation" src="assets/types/'+p.img+'.webp">')+'</div><div><div class="mono">'+p.t+'</div><h3>'+p.n+'</h3><div class="big">'+(p.pr?usd(p.pr):'Request a quote')+'</div><p class="mut">'+(p.facts||(p.sf.toLocaleString()+' sq ft'+(p.bd?' · '+p.bd+' bed':'')+(p.ba?' · '+p.ba+' bath':'')))+(p.pr?'. Price includes every file below.':'. Every file below is included in the quote.')+'</p><ul class="files" style="margin-top:14px">'+ln+'</ul><p class="mut" style="margin-top:12px">All produced in-house by UBC. No contractor, no reseller.</p><div class="btnrow"><a class="btn" href="#contact">'+(p.pr?'Buy this plan':'Request a quote')+'</a>'+(p.mod?'<a class="skb" href="#modify" style="display:inline-flex;align-items:center">Change it first</a>':'')+'</div></div>';
     det.hidden=false;det.scrollIntoView({behavior:'smooth',block:'nearest'})});
-  window.ubcRank=function(sf,beds){ranks={};PL.forEach(function(p){var d=Math.abs(Math.log(p.sf/sf))*1.3+Math.abs(p.bd-beds)*.1;ranks[p.id]=Math.max(41,Math.round(99-d*45))});flt='all';[].forEach.call($('#fchips').children,function(x){x.classList.toggle('on',x.dataset.f==='all')});draw()};
+  window.ubcRank=function(sf,beds){ranks={};PL.forEach(function(p){var d=p.sf?Math.abs(Math.log(p.sf/sf))*1.3+Math.abs(p.bd-beds)*.1:1.2;ranks[p.id]=Math.max(41,Math.round(99-d*45))});flt='all';[].forEach.call($('#fchips').children,function(x){x.classList.toggle('on',x.dataset.f==='all')});draw()};
   // --- upload search (demo): deterministic mock until the real plan reader is connected
   function hashStr(s){var h=7;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h}
   function runSearch(file,dropEl){dropEl.classList.add('busy');var seed=hashStr((file&&file.name||'x')+(file&&file.size||0));
@@ -1370,7 +1374,10 @@ new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){start();i
 <link rel="stylesheet" href="hero.css">
 <link rel="stylesheet" href="sections.css">
 <link rel="stylesheet" href="clean.css">
+<link rel="stylesheet" href="design.css">
 <script src="animations.js"></script>
+<script>/* Address of the hosted plan-reading service (see server/). Leave empty to switch automatic reading of uploaded plans off. */
+window.UBC_DETECT_URL=window.UBC_DETECT_URL||"";</script>
 <script src="modify.js"></script>
 <script src="story.js"></script>
 <script src="menu.js"></script>

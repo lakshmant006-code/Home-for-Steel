@@ -15,7 +15,7 @@
 
   /* ---- the standard plan (image 1448 x 1086); b = [x0,y0,x1,y1] in image pixels, d = [width ft, depth ft] as printed ---- */
   var STD = {
-    src: 'assets/plans/ranch-2520.webp', W: 1448, H: 1086, pxFtX: 20.4, pxFtY: 17.3,
+    src: 'assets/plans/ranch-2520.webp', dets: 'assets/plans/ranch-2520.detections.json', W: 1448, H: 1086, pxFtX: 20.4, pxFtY: 17.3,
     name: 'Ranch 2520 with garage', meta: '3 bed · 2 bath · 2-car garage · 2,520 sq ft living · 2,897 sq ft total',
     rooms: [
       { n: 'Bath 1', b: [80, 75, 355, 285], d: [F(9, 4), F(9, 10)] },
@@ -39,13 +39,13 @@
       { n: 'Front porch', b: [870, 740, 1070, 880], d: [F(10), F(5)] }
     ]
   };
-  var CHIPS = ['Make it bigger', 'Add a window', 'Add a door', 'Add a closet', 'Add an island', 'Open it up'];
+  var CHIPS = ['Make it bigger', 'Add a window', 'Remove a window', 'Add a door', 'Add a closet', 'Add an island', 'Open it up'];
 
   root.innerHTML =
     '<div class="m2">' +
     '<div class="m2-win">' +
     '<div class="m2-bar"><i class="d r"></i><i class="d y"></i><i class="d g"></i>' +
-    '<span class="m2-own"><label class="skb" for="m2File">Use my own plan</label><input id="m2File" type="file" accept="image/*" hidden><button type="button" class="skb" id="m2Reset" hidden>Back to the standard plan</button></span>' +
+    '<span class="m2-own"><label class="skb" for="m2File">Use my own plan</label><input id="m2File" type="file" accept="image/*" hidden><button type="button" class="skb" id="m2Reset" hidden>Back to the standard plan</button><button type="button" class="skb" id="m2DetBtn" hidden>Show what we detected</button></span>' +
     '<span class="m2-hint">Drag over an area to change it</span></div>' +
     '<div class="m2-sel" id="m2Sel"><div><span id="m2SelTx"></span><button type="button" id="m2Clear">Clear</button></div></div>' +
     '<div class="m2-body">' +
@@ -62,7 +62,7 @@
 
   var stage = $('#m2Stage'), svg = $('#m2Svg'), img = $('#m2Img'), box = $('#m2Box'), selBar = $('#m2Sel'), list = $('#m2List'),
     apply = $('#m2Apply'), note = $('#m2Note'), input = $('#m2In');
-  var fig = STD, rooms = STD.rooms, sel = null, changes = [], drag = null, sent = false, objUrl = null;
+  var dets = [], fig = STD, rooms = STD.rooms, sel = null, changes = [], drag = null, sent = false, objUrl = null;
 
   function toPlan(cx, cy) { var pt = svg.createSVGPoint(); pt.x = cx; pt.y = cy; var m = svg.getScreenCTM(); return m ? pt.matrixTransform(m.inverse()) : { x: 0, y: 0 }; }
   function toClient(x, y) { var pt = svg.createSVGPoint(); pt.x = x; pt.y = y; return pt.matrixTransform(svg.getScreenCTM()); }
@@ -75,16 +75,72 @@
     fx(function () { G.set('#m2Fig', { clipPath: 'inset(0 100% 0 0)' }); });   // start hidden: no flash of the finished plan
     img.onload = function () {
       svg.setAttribute('viewBox', '0 0 ' + fig.W + ' ' + fig.H);
-      svg.innerHTML = rooms.map(function (r, i) { var b = R(r); return '<rect class="rm" data-i="' + i + '" x="' + b.x0 + '" y="' + b.y0 + '" width="' + (b.x1 - b.x0) + '" height="' + (b.y1 - b.y0) + '"/>'; }).join('') + '<g id="m2Adds"></g><g id="m2Marks"></g>';
+      svg.innerHTML = rooms.map(function (r, i) { var b = R(r); return '<rect class="rm" data-i="' + i + '" x="' + b.x0 + '" y="' + b.y0 + '" width="' + (b.x1 - b.x0) + '" height="' + (b.y1 - b.y0) + '"/>'; }).join('') + '<g id="m2Dets"></g><g id="m2Adds"></g><g id="m2Marks"></g>'; renderDets();
       fx(function () {
         G.fromTo('#m2Fig', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: 'power3.inOut', clearProps: 'clipPath' });
       });
       syncBox();
     };
     img.src = f.src;
+    loadDets(f);
     clearSel(); renderList(); renderRooms();
     apply.textContent = 'Apply my changes'; apply.disabled = true;
     note.textContent = f === STD ? 'Demo: changes are redrawn locally. Your real request goes to our team.' : 'Room detection for uploaded drawings needs our plan reader. For now, drag over any area and describe the change.';
+  }
+
+  /* ---------- plan-detection model output (doors, windows, walls found on the drawing) ---------- */
+  function loadDets(f) {
+    dets = []; var btn = $('#m2DetBtn'); btn.hidden = true; svg.classList.remove('show-dets'); btn.textContent = 'Show what we detected';
+    function got(j) {
+      if (fig !== f) return;
+      dets = ((j && j.detections) || []).map(function (d) { return { cls: d.cls, conf: d.conf, b: d.box }; });
+      renderDets(); if (dets.length) { btn.hidden = false; note.textContent = 'We found ' + summ(dets) + ' on this plan, so changes snap to the real walls, doors and windows.'; }
+    }
+    if (f.dets) { fetch(f.dets).then(function (r) { return r.json(); }).then(got).catch(function () {}); }
+    else if (window.UBC_DETECT_URL && f.file) {                    // optional: a hosted copy of the detection model reads uploaded plans
+      var fd = new FormData(); fd.append('image', f.file); note.textContent = 'Reading your plan…';
+      fetch(window.UBC_DETECT_URL, { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(got)
+        .catch(function () { note.textContent = 'We could not read that plan automatically. Drag over any area and describe the change.'; });
+    }
+  }
+  function renderDets() {
+    var g = $('#m2Dets', svg); if (!g) return;
+    g.innerHTML = dets.map(function (d, i) { var b = d.b; return '<rect class="det" data-c="' + d.cls.replace(/\s/g, '') + '" data-i="' + i + '" x="' + b[0] + '" y="' + b[1] + '" width="' + (b[2] - b[0]) + '" height="' + (b[3] - b[1]) + '" rx="3"/>'; }).join('');
+  }
+  function elsIn(x0, y0, x1, y1) {
+    return dets.filter(function (d) {
+      var b = { x0: d.b[0], y0: d.b[1], x1: d.b[2], y1: d.b[3] }, a = (b.x1 - b.x0) * (b.y1 - b.y0) || 1, mx = (b.x0 + b.x1) / 2, my = (b.y0 + b.y1) / 2;
+      return (mx >= x0 && mx <= x1 && my >= y0 && my <= y1) || overlap(b, x0, y0, x1, y1) / a >= 0.5;
+    });
+  }
+  function summ(els) {
+    var c = { door: 0, window: 0, wall: 0 }, p = [];
+    els.forEach(function (d) { if (/Door/.test(d.cls)) c.door++; else if (d.cls === 'Window') c.window++; else if (/Wall/.test(d.cls)) c.wall++; });
+    if (c.door) p.push(c.door + (c.door > 1 ? ' doors' : ' door'));
+    if (c.window) p.push(c.window + (c.window > 1 ? ' windows' : ' window'));
+    if (c.wall) p.push(c.wall + (c.wall > 1 ? ' wall segments' : ' wall segment'));
+    return p.join(' · ');
+  }
+  function wallNear(s, cx, cy) {                                  // closest detected wall to the selection
+    var best = null, bd = 1e9, pad = 70;
+    dets.forEach(function (d) {
+      if (!/Wall/.test(d.cls)) return; var b = d.b;
+      if (b[2] < s.x0 - pad || b[0] > s.x1 + pad || b[3] < s.y0 - pad || b[1] > s.y1 + pad) return;
+      var qx = Math.max(b[0], Math.min(cx, b[2])), qy = Math.max(b[1], Math.min(cy, b[3])), dd = Math.hypot(qx - cx, qy - cy);
+      if (dd < bd) { bd = dd; best = d; }
+    });
+    return best;
+  }
+  function innerWalls(s) {                                        // detected walls inside the selection, leaving the outside walls of the house alone
+    var walls = dets.filter(function (d) { return /Wall/.test(d.cls); });
+    if (!walls.length) return [];
+    var E = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 };
+    walls.forEach(function (d) { E.x0 = Math.min(E.x0, d.b[0]); E.y0 = Math.min(E.y0, d.b[1]); E.x1 = Math.max(E.x1, d.b[2]); E.y1 = Math.max(E.y1, d.b[3]); });
+    return elsIn(s.x0, s.y0, s.x1, s.y1).filter(function (d) {
+      if (!/Wall/.test(d.cls)) return false;
+      var b = d.b, hz = (b[2] - b[0]) >= (b[3] - b[1]), mx = (b[0] + b[2]) / 2, my = (b[1] + b[3]) / 2;
+      return hz ? (my > E.y0 + 36 && my < E.y1 - 36) : (mx > E.x0 + 36 && mx < E.x1 - 36);
+    });
   }
   function renderRooms() {
     $('#m2RL').hidden = !rooms.length;
@@ -97,11 +153,12 @@
     if (objUrl) URL.revokeObjectURL(objUrl);
     objUrl = URL.createObjectURL(f);
     var t = new Image();
-    t.onload = function () { load({ src: objUrl, W: t.naturalWidth, H: t.naturalHeight, name: f.name, rooms: [] }); };
+    t.onload = function () { load({ src: objUrl, W: t.naturalWidth, H: t.naturalHeight, name: f.name, rooms: [], file: f }); };
     t.onerror = function () { note.textContent = 'That file could not be read as an image. Try a PNG or JPG of your plan.'; };
     t.src = objUrl;
   });
   $('#m2Reset').onclick = function () { load(STD); };
+  $('#m2DetBtn').onclick = function () { var on = svg.classList.toggle('show-dets'); this.textContent = on ? 'Hide detected parts' : 'Show what we detected'; };
 
   /* ---------- drag to select ---------- */
   function stageXY(e) { var b = stage.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; }
@@ -149,12 +206,14 @@
     if (hs.length === 1) dim = fmt(hs[0].d[0]) + ' × ' + fmt(hs[0].d[1]);
     else if (fig === STD) dim = '≈ ' + Math.round((x1 - x0) / fig.pxFtX) + "' × " + Math.round((y1 - y0) / fig.pxFtY) + "'";
     else dim = '';
-    sel = { x0: x0, y0: y0, x1: x1, y1: y1, rooms: hs, label: label, dim: dim };
+    sel = { x0: x0, y0: y0, x1: x1, y1: y1, rooms: hs, label: label, dim: dim, els: elsIn(x0, y0, x1, y1) };
+    var found = summ(sel.els);
+    $$('.det', svg).forEach(function (r) { r.classList.toggle('on', sel.els.indexOf(dets[+r.dataset.i]) > -1); });
     hilite(x0, y0, x1, y1); syncBox(); box.hidden = false; box.classList.remove('done'); void box.offsetWidth; box.classList.add('done');
     var names = hs.length > 1 ? hs.map(function (r) { return r.n; }).join(', ') : '';
-    $('#m2SelTx').textContent = 'Selected · ' + label + (dim ? ' · ' + dim : '');
+    $('#m2SelTx').textContent = 'Selected · ' + label + (dim ? ' · ' + dim : '') + (found ? ' · ' + found : '');
     selBar.classList.add('on');
-    $('#m2QT').textContent = label; $('#m2QS').textContent = names || dim || 'Your marked area';
+    $('#m2QT').textContent = label; $('#m2QS').textContent = (names || dim || 'Your marked area') + (found ? ' · ' + found : '');
     var q = $('#m2Quote'), was = q.hidden; q.hidden = false;
     $$('#m2Chips button').forEach(function (c) { c.disabled = false; });
     var hint = $('.m2-hint'); hint.classList.add('ok'); hint.innerHTML = 'Pick a change, or describe your own';
@@ -172,6 +231,7 @@
   function clearSel() {
     sel = null; box.hidden = true; box.classList.remove('done'); selBar.classList.remove('on'); $('#m2Quote').hidden = true;
     $$('.rm', svg).forEach(function (g) { g.classList.remove('hit'); });
+    $$('.det', svg).forEach(function (g) { g.classList.remove('on'); });
     $$('#m2Chips button').forEach(function (c) { c.disabled = true; });
     var hint = $('.m2-hint'); hint.classList.remove('ok'); hint.innerHTML = 'Drag over an area to change it';
   }
@@ -221,23 +281,60 @@
         glow(r);
         if (o.d) info += o.n + ' ' + fmt(o.d[0]) + ' × ' + fmt(o.d[1]) + ' → ' + fmt(o.d[0] * f) + ' × ' + fmt(o.d[1] * f) + '. ';
       });
+    } else if (/(remove|delete|close|fill).*window|window.*(remove|delete)/.test(t)) {
+      var ws = (s.els || []).filter(function (d) { return d.cls === 'Window'; });
+      if (ws.length) {
+        ws.forEach(function (d) {                                  // wipe the window symbol and draw solid wall in its place
+          var bb = d.b, hz = (bb[2] - bb[0]) >= (bb[3] - bb[1]), mx = (bb[0] + bb[2]) / 2, my = (bb[1] + bb[3]) / 2;
+          mk('<rect x="' + (bb[0] - 3) + '" y="' + (bb[1] - 3) + '" width="' + (bb[2] - bb[0] + 6) + '" height="' + (bb[3] - bb[1] + 6) + '" fill="#fff"/>' +
+             (hz ? '<line x1="' + bb[0] + '" y1="' + my + '" x2="' + bb[2] + '" y2="' + my + '"' : '<line x1="' + mx + '" y1="' + bb[1] + '" x2="' + mx + '" y2="' + bb[3] + '"') + ' stroke="#13233a" stroke-width="7"/>');
+        });
+        info = ws.length + (ws.length > 1 ? ' windows' : ' window') + ' closed up.';
+      } else { mk('<rect x="' + s.x0 + '" y="' + s.y0 + '" width="' + w + '" height="' + h + '" rx="8" fill="none" stroke="#6d4cff" stroke-width="3" stroke-dasharray="10 8"/>'); info = 'No window found in this area.'; }
     } else if (/window/.test(t)) {
-      var L = Math.min(110, Math.max(60, w * 0.4));
-      mk('<rect x="' + (cx - L / 2) + '" y="' + (s.y0 - 8) + '" width="' + L + '" height="16" fill="#fff" stroke="#13233a" stroke-width="3"/><line x1="' + (cx - L / 2) + '" y1="' + s.y0 + '" x2="' + (cx + L / 2) + '" y2="' + s.y0 + '" stroke="#2e6a8e" stroke-width="3"/>');
+      var L = Math.min(110, Math.max(60, w * 0.4)), wl = wallNear(s, cx, cy);
+      if (wl) {                                                    // snap onto the closest detected wall
+        var wb = wl.b, whz = (wb[2] - wb[0]) >= (wb[3] - wb[1]);
+        if (whz) { var wx = Math.max(wb[0] + L / 2, Math.min(cx, wb[2] - L / 2)), wy = (wb[1] + wb[3]) / 2;
+          mk('<rect x="' + (wx - L / 2) + '" y="' + (wy - 8) + '" width="' + L + '" height="16" fill="#fff" stroke="#13233a" stroke-width="3"/><line x1="' + (wx - L / 2) + '" y1="' + wy + '" x2="' + (wx + L / 2) + '" y2="' + wy + '" stroke="#2e6a8e" stroke-width="3"/>');
+        } else { var vx = (wb[0] + wb[2]) / 2, vy = Math.max(wb[1] + L / 2, Math.min(cy, wb[3] - L / 2));
+          mk('<rect x="' + (vx - 8) + '" y="' + (vy - L / 2) + '" width="16" height="' + L + '" fill="#fff" stroke="#13233a" stroke-width="3"/><line x1="' + vx + '" y1="' + (vy - L / 2) + '" x2="' + vx + '" y2="' + (vy + L / 2) + '" stroke="#2e6a8e" stroke-width="3"/>'); }
+        info = 'Window placed on the wall.';
+      } else {
+        mk('<rect x="' + (cx - L / 2) + '" y="' + (s.y0 - 8) + '" width="' + L + '" height="16" fill="#fff" stroke="#13233a" stroke-width="3"/><line x1="' + (cx - L / 2) + '" y1="' + s.y0 + '" x2="' + (cx + L / 2) + '" y2="' + s.y0 + '" stroke="#2e6a8e" stroke-width="3"/>');
+      }
     } else if (/door|entry|opening/.test(t)) {
-      var d = Math.min(70, Math.max(46, Math.min(w, h) * 0.45));
-      mk('<line x1="' + (cx - d / 2) + '" y1="' + s.y1 + '" x2="' + (cx + d / 2) + '" y2="' + s.y1 + '" stroke="#fff" stroke-width="12"/><line x1="' + (cx - d / 2) + '" y1="' + s.y1 + '" x2="' + (cx - d / 2) + '" y2="' + (s.y1 - d) + '" stroke="#13233a" stroke-width="3"/><path d="M' + (cx - d / 2) + ' ' + (s.y1 - d) + ' A' + d + ' ' + d + ' 0 0 1 ' + (cx + d / 2) + ' ' + s.y1 + '" fill="none" stroke="#13233a" stroke-width="2"/>');
+      var d = Math.min(70, Math.max(46, Math.min(w, h) * 0.45)), dl = wallNear(s, cx, cy);
+      if (dl) {                                                    // cut a door into the closest detected wall, swinging into the selected room
+        var db = dl.b, dhz = (db[2] - db[0]) >= (db[3] - db[1]);
+        if (dhz) { var dx = Math.max(db[0] + d / 2, Math.min(cx, db[2] - d / 2)), dy = (db[1] + db[3]) / 2, dir = cy < dy ? -1 : 1;
+          mk('<line x1="' + (dx - d / 2) + '" y1="' + dy + '" x2="' + (dx + d / 2) + '" y2="' + dy + '" stroke="#fff" stroke-width="14"/><line x1="' + (dx - d / 2) + '" y1="' + dy + '" x2="' + (dx - d / 2) + '" y2="' + (dy + dir * d) + '" stroke="#13233a" stroke-width="3"/><path d="M' + (dx - d / 2) + ' ' + (dy + dir * d) + ' A' + d + ' ' + d + ' 0 0 ' + (dir < 0 ? 1 : 0) + ' ' + (dx + d / 2) + ' ' + dy + '" fill="none" stroke="#13233a" stroke-width="2"/>');
+        } else { var ex = (db[0] + db[2]) / 2, ey = Math.max(db[1] + d / 2, Math.min(cy, db[3] - d / 2)), dr = cx < ex ? -1 : 1;
+          mk('<line x1="' + ex + '" y1="' + (ey - d / 2) + '" x2="' + ex + '" y2="' + (ey + d / 2) + '" stroke="#fff" stroke-width="14"/><line x1="' + ex + '" y1="' + (ey - d / 2) + '" x2="' + (ex + dr * d) + '" y2="' + (ey - d / 2) + '" stroke="#13233a" stroke-width="3"/><path d="M' + (ex + dr * d) + ' ' + (ey - d / 2) + ' A' + d + ' ' + d + ' 0 0 ' + (dr > 0 ? 1 : 0) + ' ' + ex + ' ' + (ey + d / 2) + '" fill="none" stroke="#13233a" stroke-width="2"/>'); }
+        info = 'Door cut into the wall.';
+      } else {
+        mk('<line x1="' + (cx - d / 2) + '" y1="' + s.y1 + '" x2="' + (cx + d / 2) + '" y2="' + s.y1 + '" stroke="#fff" stroke-width="12"/><line x1="' + (cx - d / 2) + '" y1="' + s.y1 + '" x2="' + (cx - d / 2) + '" y2="' + (s.y1 - d) + '" stroke="#13233a" stroke-width="3"/><path d="M' + (cx - d / 2) + ' ' + (s.y1 - d) + ' A' + d + ' ' + d + ' 0 0 1 ' + (cx + d / 2) + ' ' + s.y1 + '" fill="none" stroke="#13233a" stroke-width="2"/>');
+      }
     } else if (/island|kitchen/.test(t)) {
       var iw = Math.min(150, Math.max(70, w * 0.5)), ih = Math.min(48, Math.max(30, h * 0.2));
       mk('<rect x="' + (cx - iw / 2) + '" y="' + (cy - ih / 2) + '" width="' + iw + '" height="' + ih + '" rx="5" fill="#fff" stroke="#13233a" stroke-width="3"/>');
     } else if (/walk|closet|storage|pantry/.test(t)) {
       var cw = Math.min(100, w * 0.5), ch = Math.min(70, h * 0.5);
       mk('<rect x="' + (s.x1 - cw) + '" y="' + (s.y1 - ch) + '" width="' + cw + '" height="' + ch + '" fill="rgba(46,106,142,.12)" stroke="#13233a" stroke-width="3"/><line x1="' + (s.x1 - cw) + '" y1="' + (s.y1 - ch) + '" x2="' + s.x1 + '" y2="' + s.y1 + '" stroke="#9aa6b0" stroke-width="2"/>');
-    } else if (/open|remove|wall|merge/.test(t) && s.rooms.length > 1) {
-      var edges = [];
-      for (var i = 0; i < s.rooms.length; i++) for (var j = i + 1; j < s.rooms.length; j++) edges = edges.concat(sharedEdges(s.rooms[i], s.rooms[j]));
-      if (edges.length) { edges.forEach(function (e) { mk('<line x1="' + e[0] + '" y1="' + e[1] + '" x2="' + e[2] + '" y2="' + e[3] + '" stroke="#fff" stroke-width="14"/><line x1="' + e[0] + '" y1="' + e[1] + '" x2="' + e[2] + '" y2="' + e[3] + '" stroke="#6d4cff" stroke-width="3" stroke-dasharray="10 8"/>'); }); info = 'Wall between ' + s.rooms.map(function (r) { return r.n; }).join(' and ') + ' opened. '; }
-      else mk('<rect x="' + s.x0 + '" y="' + s.y0 + '" width="' + w + '" height="' + h + '" rx="8" fill="none" stroke="#6d4cff" stroke-width="3" stroke-dasharray="10 8"/>');
+    } else if (/open|remove|wall|merge|knock/.test(t)) {
+      var iw = innerWalls(s);
+      if (iw.length) {                                             // take out the detected inner wall segments inside the selection
+        iw.forEach(function (d) {
+          var bb = d.b;
+          mk('<rect x="' + (bb[0] - 3) + '" y="' + (bb[1] - 3) + '" width="' + (bb[2] - bb[0] + 6) + '" height="' + (bb[3] - bb[1] + 6) + '" fill="#fff"/><rect x="' + bb[0] + '" y="' + bb[1] + '" width="' + (bb[2] - bb[0]) + '" height="' + (bb[3] - bb[1]) + '" fill="none" stroke="#6d4cff" stroke-width="3" stroke-dasharray="10 8"/>');
+        });
+        info = iw.length + (iw.length > 1 ? ' wall segments' : ' wall segment') + ' opened up.';
+      } else if (s.rooms.length > 1) {
+        var edges = [];
+        for (var i = 0; i < s.rooms.length; i++) for (var j = i + 1; j < s.rooms.length; j++) edges = edges.concat(sharedEdges(s.rooms[i], s.rooms[j]));
+        if (edges.length) { edges.forEach(function (e) { mk('<line x1="' + e[0] + '" y1="' + e[1] + '" x2="' + e[2] + '" y2="' + e[3] + '" stroke="#fff" stroke-width="14"/><line x1="' + e[0] + '" y1="' + e[1] + '" x2="' + e[2] + '" y2="' + e[3] + '" stroke="#6d4cff" stroke-width="3" stroke-dasharray="10 8"/>'); }); info = 'Wall between ' + s.rooms.map(function (r) { return r.n; }).join(' and ') + ' opened. '; }
+        else mk('<rect x="' + s.x0 + '" y="' + s.y0 + '" width="' + w + '" height="' + h + '" rx="8" fill="none" stroke="#6d4cff" stroke-width="3" stroke-dasharray="10 8"/>');
+      } else { mk('<rect x="' + s.x0 + '" y="' + s.y0 + '" width="' + w + '" height="' + h + '" rx="8" fill="none" stroke="#6d4cff" stroke-width="3" stroke-dasharray="10 8"/>'); info = 'No inside wall found in this area.'; }
     } else {
       mk('<rect x="' + (s.x0 - 6) + '" y="' + (s.y0 - 6) + '" width="' + (w + 12) + '" height="' + (h + 12) + '" rx="10" fill="rgba(109,76,255,.06)" stroke="#6d4cff" stroke-width="3" stroke-dasharray="10 8"/>');
     }
