@@ -3,7 +3,7 @@
 (function () {
   'use strict';
   var hero = document.getElementById('top');
-  if (!hero) return;
+  if (!hero || !document.getElementById('skPad')) return;      // the home page has a room builder now, not a sketch pad
   var stop = document.createElement('button');
   stop.type = 'button';
   stop.className = 'sk-stop';

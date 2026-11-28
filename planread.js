@@ -25,6 +25,23 @@
   function open(m, w, h, r) { return dilate(erode(m, w, h, r), w, h, r); }
   function count(m) { var n = 0; for (var i = 0; i < m.length; i++) n += m[i]; return n; }
 
+  function shapeRects(lab, id, c, w, h, cell) {                    // the room's real outline as rectangles (scanning coarse cells, merging identical runs down the rows)
+    var rects = [], prev = {}, y, x;
+    for (y = c.y0; y <= c.y1; y += cell) {
+      var cur = {}, yy = Math.min(h - 1, y + (cell >> 1)), x0 = -1;
+      for (x = c.x0; x <= c.x1 + cell; x += cell) {
+        var on = x <= c.x1 && lab[yy * w + Math.min(w - 1, x + (cell >> 1))] === id;
+        if (on && x0 < 0) x0 = x;
+        if (!on && x0 >= 0) {
+          var key = x0 + '-' + x, r = prev[key];
+          if (r) r.y1 = y + cell; else { r = { x0: x0, x1: x, y0: y, y1: y + cell }; rects.push(r); }
+          cur[key] = r; x0 = -1;
+        }
+      }
+      prev = cur;
+    }
+    return rects;
+  }
   function floodOutside(wall, w, h) {                             // everything reachable from the border without crossing a wall
     var out = new Uint8Array(w * h), stack = [], i, x, y;
     function push(p) { if (!wall[p] && !out[p]) { out[p] = 1; stack.push(p); } }
@@ -52,6 +69,7 @@
       }
       list.push(c);
     }
+    list.lab = lab;
     return list;
   }
 
@@ -110,15 +128,16 @@
       });
       if (dbg) dbg.push({ light: lightPct[li], comps: cs.length, big: cs.filter(function (c) { return c.area >= minArea; }).length, kept: ok.length, covered: Math.round(covered / foot * 100), merged: cs.filter(function (c) { return c.area > foot * 0.7; }).length, ragged: cs.filter(function (c) { var bw = c.x1 - c.x0 + 1, bh = c.y1 - c.y0 + 1; return c.area >= minArea && c.area < bw * bh * 0.35; }).length });
       var score = ok.length * Math.min(1, covered / (foot * 0.5));   // many rooms that together fill a good part of the building
-      if (!best || score > best.score + 0.01) best = { score: score, keep: ok };
+      if (!best || score > best.score + 0.01) best = { score: score, keep: ok, lab: cs.lab };
     }
     var keep = best.keep;
     keep.sort(function (a, b) { var ra = Math.round(((a.y0 + a.y1) / 2) / (h / 7)), rb = Math.round(((b.y0 + b.y1) / 2) / (h / 7)); return ra - rb || a.x0 - b.x0; });
     // rooms come from separate flood-filled areas, so none can duplicate another (a U-shaped room's box may cover its neighbours, which is fine)
-    var pad = Math.max(2, Math.round(big * 0.004));                  // grow each box back over half the wall that was cut away
+    var pad = Math.max(2, Math.round(big * 0.004)), cell = Math.max(3, Math.round(big / 150));   // pad: grow back over half the wall that was cut away; cell: outline resolution
     var rooms = keep.map(function (c, k) {
       return { n: 'Room ' + (k + 1),
         b: [Math.max(0, Math.round((c.x0 - pad) / s)), Math.max(0, Math.round((c.y0 - pad) / s)), Math.min(W, Math.round((c.x1 + pad) / s)), Math.min(H, Math.round((c.y1 + pad) / s))],
+        rects: shapeRects(best.lab, c.id, c, w, h, cell).map(function (r) { return [Math.round(r.x0 / s), Math.round(r.y0 / s), Math.min(W, Math.round(r.x1 / s)), Math.min(H, Math.round(r.y1 / s))]; }),
         share: c.area / foot };
     });
     if (dbg) dbg.push({ foot: Math.round(foot / (w * h) * 100), bboxFill: Math.round(foot / bbox * 100), seal: sealPct[Math.min(si, sealPct.length - 1)] });

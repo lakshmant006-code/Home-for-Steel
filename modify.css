@@ -88,3 +88,8 @@
 #m2Svg .rl circle{fill:#6d4cff;stroke:#fff;stroke-width:2.5}
 #m2Svg .rl text{fill:#fff;font-family:Inter,sans-serif;font-weight:600;pointer-events:none}
 #m2Svg rect.rm.peek{fill:rgba(109,76,255,.16);stroke:#6d4cff;stroke-width:3}
+
+/* rooms found on an uploaded plan keep their real outline, and the list shows each one's estimated size */
+#m2Svg path.rm{fill:transparent;stroke:none;transition:fill .25s;shape-rendering:crispEdges}
+#m2Svg path.rm.hit,#m2Svg path.rm.peek{fill:rgba(109,76,255,.22)}
+.m2-rooms button small{margin-left:7px;font:400 .7rem/1 var(--font-mono,monospace);color:var(--mute,#5B6B78);letter-spacing:.02em}

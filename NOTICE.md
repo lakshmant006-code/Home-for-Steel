@@ -10,3 +10,9 @@ That project's licence text applies to the model and code taken from it.
 Uploaded plans are read inside the visitor's browser (nothing is sent anywhere):
 - `assets/models/floorplan-1024.onnx` is the YOLOv8 floor-plan model from the project above, exported to ONNX with its weights stored at half precision (converted back to full precision when loaded).
 - `assets/ort/` holds ONNX Runtime Web (MIT License, Copyright (c) Microsoft Corporation), which runs the model.
+
+## Tesseract.js
+
+Reads the room names and sizes printed on an uploaded plan, in the visitor's browser (files in `assets/ocr/`).
+Tesseract.js and Tesseract.js-core: Apache License 2.0, https://github.com/naptha/tesseract.js
+English language data (`eng.traineddata`, "best" integer model): Apache License 2.0, https://github.com/tesseract-ocr/tessdata_best
