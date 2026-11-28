@@ -157,7 +157,7 @@
     /* Every start state is set right now, in the same task that un-hid the page, so the final
        layout is never painted before it animates (no flash of the finished heading). */
     var bar = $('.sh-bar', sec), h = $('h2.lead', sec), sub = $('.sub', sec);
-    var blocks = $$('.finder, .m2-pick, .m2-win, .bring-grid > .drop', sec), cards = $$('.c3', sec);
+    var blocks = $$('.finder, .m2-pick, .m2-win, .bring-grid > .drop, .cg-form', sec), cards = $$('.c3', sec);
     var words = h ? splitWords(h) : [];
     if (h) h.classList.add('in');
     blocks.forEach(function (b) { b.classList.add('in'); });
