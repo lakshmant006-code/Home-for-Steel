@@ -43,11 +43,10 @@
 
   root.innerHTML =
     '<div class="m2">' +
-    '<div class="m2-pick"><div class="m2-step"><b>1</b><span id="m2Title"></span></div>' +
-    '<div class="m2-own"><label class="skb" for="m2File">Use my own plan</label><input id="m2File" type="file" accept="image/*" hidden><button type="button" class="skb" id="m2Reset" hidden>Back to the standard plan</button></div></div>' +
     '<div class="m2-win">' +
-    '<div class="m2-bar"><i class="d r"></i><i class="d y"></i><i class="d g"></i><span class="m2-meta" id="m2Meta"></span>' +
-    '<span class="m2-hint"><b>2</b>Drag over an area to change it</span></div>' +
+    '<div class="m2-bar"><i class="d r"></i><i class="d y"></i><i class="d g"></i>' +
+    '<span class="m2-own"><label class="skb" for="m2File">Use my own plan</label><input id="m2File" type="file" accept="image/*" hidden><button type="button" class="skb" id="m2Reset" hidden>Back to the standard plan</button></span>' +
+    '<span class="m2-hint">Drag over an area to change it</span></div>' +
     '<div class="m2-sel" id="m2Sel"><div><span id="m2SelTx"></span><button type="button" id="m2Clear">Clear</button></div></div>' +
     '<div class="m2-body">' +
     '<div class="m2-stage" id="m2Stage"><div class="m2-fig" id="m2Fig"><img id="m2Img" alt="Floor plan to modify" draggable="false"><svg id="m2Svg" aria-hidden="true"></svg></div><div class="m2-box" id="m2Box" hidden></div></div>' +
@@ -72,16 +71,13 @@
   /* ---------- load a plan (standard or the visitor's own) ---------- */
   function load(f) {
     fig = f; rooms = f.rooms; changes = []; sent = false;
-    $('#m2Title').textContent = f === STD ? 'Your plan: ' + f.name : 'Your own plan: ' + f.name;
-    $('#m2Meta').textContent = f.meta || 'Free selection: drag over any part of your drawing';
     $('#m2Reset').hidden = f === STD;
-    fx(function () { G.set('#m2Fig', { clipPath: 'inset(0 100% 0 0)' }); G.set('#m2Title', { opacity: 0, y: 10 }); });   // start hidden: no flash of the finished plan
+    fx(function () { G.set('#m2Fig', { clipPath: 'inset(0 100% 0 0)' }); });   // start hidden: no flash of the finished plan
     img.onload = function () {
       svg.setAttribute('viewBox', '0 0 ' + fig.W + ' ' + fig.H);
       svg.innerHTML = rooms.map(function (r, i) { var b = R(r); return '<rect class="rm" data-i="' + i + '" x="' + b.x0 + '" y="' + b.y0 + '" width="' + (b.x1 - b.x0) + '" height="' + (b.y1 - b.y0) + '"/>'; }).join('') + '<g id="m2Adds"></g><g id="m2Marks"></g>';
       fx(function () {
         G.fromTo('#m2Fig', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: 'power3.inOut', clearProps: 'clipPath' });
-        G.to('#m2Title', { y: 0, opacity: 1, duration: 0.6, clearProps: 'all' });
       });
       syncBox();
     };
@@ -161,7 +157,7 @@
     $('#m2QT').textContent = label; $('#m2QS').textContent = names || dim || 'Your marked area';
     var q = $('#m2Quote'), was = q.hidden; q.hidden = false;
     $$('#m2Chips button').forEach(function (c) { c.disabled = false; });
-    var hint = $('.m2-hint'); hint.classList.add('ok'); hint.innerHTML = '<b>3</b>Pick a change, or describe your own';
+    var hint = $('.m2-hint'); hint.classList.add('ok'); hint.innerHTML = 'Pick a change, or describe your own';
     fx(function () {
       G.fromTo(box, { scale: 1.03 }, { scale: 1, duration: 0.6, ease: 'back.out(3)' });
       G.fromTo(q, { x: was ? 40 : 14, opacity: was ? 0 : 0.4 }, { x: 0, opacity: 1, duration: 0.7, ease: 'expo.out' });
@@ -177,7 +173,7 @@
     sel = null; box.hidden = true; box.classList.remove('done'); selBar.classList.remove('on'); $('#m2Quote').hidden = true;
     $$('.rm', svg).forEach(function (g) { g.classList.remove('hit'); });
     $$('#m2Chips button').forEach(function (c) { c.disabled = true; });
-    var hint = $('.m2-hint'); hint.classList.remove('ok'); hint.innerHTML = '<b>2</b>Drag over an area to change it';
+    var hint = $('.m2-hint'); hint.classList.remove('ok'); hint.innerHTML = 'Drag over an area to change it';
   }
   $('#m2Clear').onclick = clearSel;
   if (window.ResizeObserver) new ResizeObserver(syncBox).observe(stage); else window.addEventListener('resize', syncBox);
