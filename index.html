@@ -1156,7 +1156,7 @@ document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
       if(q<1){var pp=PL[i%PL.length],a=pmap(pp[0],pp[1]);x=a[0]+(x-a[0])*e;y=a[1]+(y-a[1])*e-Math.sin(Math.PI*e)*H*.08}
       var dep=1-Math.max(0,Math.min(1,(dpt[i]+60)/120));var tn=mt[i]&255;ctx.globalAlpha=q<1?Math.min(1,e*3):(gh?.3+.3*dep:.6+.4*dep);ctx.fillStyle='#fff';ctx.fillRect(x,y,.78,.78)}
     // continuous stream: dots leave the plan all the time and land on the model
-    for(var s=0;s<ST.length;s++){var p=ST[s],u=(t*p.sp+p.ph)%1;var k=p.k;proj(k,ca,sa,cp,sp,f,D,cx,cy,out);var pq=PL[s%PL.length],a=pmap(pq[0],p.j<.4?pq[1]*.5-.12:.5+pq[1]*.5) /* most dots leave the front half of the plan; the rest from the back half and just above it */,e=ez(Math.min(1,u*1.25)),x=a[0]+(out[0]-a[0])*e,y=a[1]+(out[1]-a[1])*e-Math.sin(Math.PI*e)*H*(W<760?.1:.03)*(.4+p.j);
+    for(var s=0;s<ST.length;s++){var p=ST[s],u=(t*p.sp+p.ph)%1;var k=p.k;proj(k,ca,sa,cp,sp,f,D,cx,cy,out);var pq=PL[s%PL.length],a=pmap(pq[0],pq[1]) /* each dot starts exactly on one of the plan's own white lines, front and back */,e=ez(Math.min(1,u*1.25)),x=a[0]+(out[0]-a[0])*e,y=a[1]+(out[1]-a[1])*e-Math.sin(Math.PI*e)*H*(W<760?.1:.03)*(.4+p.j);
       ctx.globalAlpha=u<.08?u/.08:u>.85?(1-u)/.15:1;ctx.fillStyle='#fff';ctx.fillRect(x,y,.75,.75)}
     ctx.globalAlpha=1}
   function start(){if(!vis||raf||!ready)return;if(!t0)t0=performance.now()-3200;raf=requestAnimationFrame(draw)}
