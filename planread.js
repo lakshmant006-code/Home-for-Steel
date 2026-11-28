@@ -55,7 +55,7 @@
     return list;
   }
 
-  function read(img, dbg) {
+  function read(img, dets, dbg) {
     var W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
     if (!W || !H) return { rooms: [], footprint: 0 };
     var s = Math.min(1, 960 / Math.max(W, H)), w = Math.max(8, Math.round(W * s)), h = Math.max(8, Math.round(H * s));
@@ -68,6 +68,17 @@
     var big = Math.max(w, h);
     var thick = open(dark, w, h, 1);                                 // walls survive, 1 to 2 px furniture lines and text do not
     if (count(thick) < w * h * 0.004) thick = dark;                  // hand sketches with thin lines: keep everything
+    var usedModel = 0;
+    if (dets && dets.length) {                                       // the detection model's walls, doors, windows and columns become part of the wall mask
+      var SEAL = { 'Wall': 1, 'Door': 1, 'Sliding Door': 1, 'Window': 1, 'Curtain Wall': 1, 'Column': 1 }, grow = Math.max(1, Math.round(big * 0.003));
+      thick = thick.slice();
+      dets.forEach(function (d) {
+        if (!SEAL[d.cls]) return;
+        var x0 = Math.max(0, Math.floor(d.box[0] * s) - grow), y0 = Math.max(0, Math.floor(d.box[1] * s) - grow), x1 = Math.min(w - 1, Math.ceil(d.box[2] * s) + grow), y1 = Math.min(h - 1, Math.ceil(d.box[3] * s) + grow), yy, xx;
+        for (yy = y0; yy <= y1; yy++) for (xx = x0; xx <= x1; xx++) thick[yy * w + xx] = 1;
+        usedModel++;
+      });
+    }
     var bx0 = w, by0 = h, bx1 = 0, by1 = 0, tx, ty;                  // bounding box of the walls
     for (ty = 0; ty < h; ty++) for (tx = 0; tx < w; tx++) if (thick[ty * w + tx]) { if (tx < bx0) bx0 = tx; if (tx > bx1) bx1 = tx; if (ty < by0) by0 = ty; if (ty > by1) by1 = ty; }
     var bbox = Math.max(1, (bx1 - bx0 + 1) * (by1 - by0 + 1));
@@ -93,6 +104,7 @@
         var bw = c.x1 - c.x0 + 1, bh = c.y1 - c.y0 + 1;
         if (c.area < minArea || bw < big * 0.025 || bh < big * 0.025) return;
         if (c.area > foot * 0.7) return;                             // everything merged into one area: not a room
+        if (c.x0 <= 1 || c.y0 <= 1 || c.x1 >= w - 2 || c.y1 >= h - 2) return;   // touching the edge of the picture: blank margin, not a room
         if (c.area < (bw * bh) * 0.35) return;                       // ragged leftover strips, not a room
         ok.push(c); covered += c.area;
       });
@@ -102,13 +114,7 @@
     }
     var keep = best.keep;
     keep.sort(function (a, b) { var ra = Math.round(((a.y0 + a.y1) / 2) / (h / 7)), rb = Math.round(((b.y0 + b.y1) / 2) / (h / 7)); return ra - rb || a.x0 - b.x0; });
-    var uniq = [];                                                   // a box that mostly sits inside a bigger kept one is a leftover, not a room
-    keep.slice().sort(function (a, b) { return b.area - a.area; }).forEach(function (c) {
-      var dup = uniq.some(function (u) { var ox = Math.min(u.x1, c.x1) - Math.max(u.x0, c.x0), oy = Math.min(u.y1, c.y1) - Math.max(u.y0, c.y0); return ox > 0 && oy > 0 && (ox * oy) / ((c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1)) > 0.6; });
-      if (!dup) uniq.push(c);
-    });
-    keep = uniq;
-    keep.sort(function (a, b) { var ra = Math.round(((a.y0 + a.y1) / 2) / (h / 7)), rb = Math.round(((b.y0 + b.y1) / 2) / (h / 7)); return ra - rb || a.x0 - b.x0; });
+    // rooms come from separate flood-filled areas, so none can duplicate another (a U-shaped room's box may cover its neighbours, which is fine)
     var pad = Math.max(2, Math.round(big * 0.004));                  // grow each box back over half the wall that was cut away
     var rooms = keep.map(function (c, k) {
       return { n: 'Room ' + (k + 1),
@@ -119,5 +125,5 @@
     return { rooms: rooms, footprint: foot / (w * h) };
   }
 
-  window.UBCReadPlan = read;
+  window.UBCReadPlan = function (img, dets, dbg) { return read(img, dets, dbg); };
 })();

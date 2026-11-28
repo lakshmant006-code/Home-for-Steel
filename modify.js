@@ -97,7 +97,7 @@
       renderDets(); if (dets.length) { btn.hidden = false; note.textContent = 'We found ' + summ(dets) + ' on this plan, so changes snap to the real walls, doors and windows.'; }
     }
     if (f.dets) { fetch(f.dets).then(function (r) { return r.json(); }).then(got).catch(function () {}); }
-    else if (window.UBC_DETECT_URL && f.file) {                    // optional: a hosted copy of the detection model reads uploaded plans
+    else if (window.UBC_DETECT_URL && f.file && !window.UBCPlanModel) {                    // optional: a hosted copy of the detection model reads uploaded plans
       var fd = new FormData(); fd.append('image', f.file); note.textContent = 'Reading your plan…';
       fetch(window.UBC_DETECT_URL, { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(got)
         .catch(function () { note.textContent = 'We could not read that plan automatically. Drag over any area and describe the change.'; });
@@ -159,10 +159,31 @@
     });
     svg.insertBefore(frag, before);
   }
-  function readRooms(imgEl, mine) {
+
+  /* run the open-source detection model on the uploaded plan (in the browser), then build the rooms from what it found */
+  var KEEP = { 'Door': .5, 'Sliding Door': .5, 'Window': .5, 'Wall': .3, 'Column': .4, 'Stair Case': .4, 'Railing': .4, 'Curtain Wall': .4 };
+  function readUpload(imgEl, mine) {
+    if (fig !== mine) return;
+    note.textContent = 'Reading your plan…';
+    var run = window.UBCPlanModel ? window.UBCPlanModel.detect(imgEl, function (stage, f) {
+      if (fig !== mine) return;
+      note.textContent = stage === 'download' ? 'Downloading the plan reader (first time only, about 50 MB)… ' + Math.round(f * 100) + '%' : 'Reading your plan with the detection model. This takes a few seconds…';
+    }) : Promise.reject(new Error('no model'));
+    run.then(function (all) {
+      if (fig !== mine) return;
+      dets = all.filter(function (d) { return KEEP[d.cls] !== undefined && d.conf >= KEEP[d.cls]; }).map(function (d) { return { cls: d.cls, conf: d.conf, b: d.box }; });
+      renderDets();
+      var btn = $('#m2DetBtn'); btn.hidden = !dets.length;
+      readRooms(imgEl, mine, all, false);
+    }).catch(function () {
+      if (fig !== mine) return;
+      readRooms(imgEl, mine, null, true);                                  // model could not run: fall back to the line-based reader
+    });
+  }
+  function readRooms(imgEl, mine, modelDets, fellBack) {
     if (fig !== mine) return;                                               // the visitor switched plans while it was reading
     var res = null;
-    try { res = window.UBCReadPlan ? window.UBCReadPlan(imgEl) : null; } catch (e) { res = null; }
+    try { res = window.UBCReadPlan ? window.UBCReadPlan(imgEl, modelDets || undefined) : null; } catch (e) { res = null; }
     if (fig !== mine) return;
     if (!res || !res.rooms.length) {
       note.textContent = 'We could not find clear rooms on this drawing, so drag over any part of it and describe the change.';
@@ -171,7 +192,9 @@
     mine.rooms = rooms = res.rooms.map(function (r, i) { return { n: 'Room ' + (i + 1), b: r.b, d: null, auto: true }; });
     drawRoomMarks(); renderRooms(); clearSel();
     fx(function () { G.from('#m2Svg .rm, #m2Svg .rl', { opacity: 0, duration: .6, stagger: .03, ease: 'power2.out' }); });
-    note.textContent = 'We found ' + rooms.length + ' enclosed room' + (rooms.length > 1 ? 's' : '') + ' and listed ' + (rooms.length > 1 ? 'them' : 'it') + ' on the right. Open areas and glass walls can be missed, so you can also drag over any part of the plan.';
+    note.textContent = modelDets
+      ? 'Found ' + rooms.length + ' room' + (rooms.length > 1 ? 's' : '') + (dets.length ? ' · ' + summ(dets) : '') + '. Tap a room on the right, or drag over any area. Open areas can still merge into one room.'
+      : 'We found ' + rooms.length + ' enclosed room' + (rooms.length > 1 ? 's' : '') + ' using a simpler method' + (fellBack ? ' (the detection model could not load here)' : '') + '. Open areas and glass walls can be missed, so you can also drag over any part of the plan.';
   }
   function renderRooms() {
     $('#m2RL').hidden = !rooms.length;
@@ -188,8 +211,8 @@
     var t = new Image();
     t.onload = function () {
       load({ src: objUrl, W: t.naturalWidth, H: t.naturalHeight, name: f.name, rooms: [], file: f });
-      var mine = fig; note.textContent = 'Reading your plan…';
-      setTimeout(function () { readRooms(t, mine); }, 80);                 // let the plan appear first, then find the rooms
+      var mine = fig;
+      setTimeout(function () { readUpload(t, mine); }, 80);                // let the plan appear first, then read it
     };
     t.onerror = function () { note.textContent = 'That file could not be read as an image. Try a PNG or JPG of your plan.'; };
     t.src = objUrl;

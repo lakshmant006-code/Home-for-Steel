@@ -57,3 +57,9 @@ html .sg-r .fg{padding:0!important;object-fit:contain;background:#fff;display:bl
   html .sg-cap{order:-1;position:sticky;top:calc(64px + 36px + min(92vw,420px) * .4156);bottom:auto;height:176px;min-height:0;margin-bottom:-176px;overflow:hidden;z-index:4;background:#fff;border-top:1px solid var(--rule)}
   html .sg-l>.st:first-child{margin-top:0}
 }
+
+/* ---- desktop: normal desktop size, with 80px of space above and below the video card ---- */
+@media(min-width:861px){
+  html .sg-r{padding:80px 0!important;box-sizing:border-box}
+  html .sg-r .card{margin:0 auto!important;top:144px!important}                           /* 64px top bar + 80px */
+}
